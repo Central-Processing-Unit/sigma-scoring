@@ -6,6 +6,7 @@ import Junction from "./Junction";
 import ShortJunction from "./ShortJunction";
 import TallJunction from "./TallJunction";
 import GroundJunction from "./GroundJunction";
+import Corner from "./Corner";
 
 const getMousePos = (canvas: HTMLCanvasElement, evt: MouseEvent) => {
   var rect = canvas.getBoundingClientRect(), // abs. size of element
@@ -67,6 +68,11 @@ export default class PowerPlayField {
     this.junctions[4].push(new MediumJunction(1000/6 * 3, 1000/6 * 5, canvas))
     this.junctions[4].push(new ShortJunction(1000/6 * 4, 1000/6 * 5, canvas))
     this.junctions[4].push(new GroundJunction(1000/6 * 5, 1000/6 * 5, canvas))
+  
+    this.objects.push(new Corner(0, 1000/6 * 5, canvas, 'blue'))
+    this.objects.push(new Corner(1000/6 * 5, 0, canvas, 'blue', true))
+    this.objects.push(new Corner(1000/6 * 5, 1000/6 * 5, canvas, 'red'))
+    this.objects.push(new Corner(0, 0, canvas, 'red', true))
   }
 
   render(): void {
