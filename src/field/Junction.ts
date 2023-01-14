@@ -1,15 +1,15 @@
 import FieldObject from "./FieldObject";
 
-type PoleHeight = 'short' | 'medium' | 'tall'
+type JunctionHeight = 'ground' | 'short' | 'medium' | 'tall'
 
-export default class Pole extends FieldObject {
+export default class Junction extends FieldObject {
   cones: string[] = []
   lastClicked: number = 0  
-  poleHeight: PoleHeight
+  junctionHeight: JunctionHeight
 
-  constructor(x: number, y: number, canvas: HTMLCanvasElement, poleHeight: PoleHeight) {
-    super(x, y, 15, 15, canvas)
-    this.poleHeight = poleHeight
+  constructor(x: number, y: number, canvas: HTMLCanvasElement, junctionHeight: JunctionHeight, radius: number = 15) {
+    super(x, y, radius, radius, canvas)
+    this.junctionHeight = junctionHeight
   }
 
   render(): void {
@@ -22,8 +22,13 @@ export default class Pole extends FieldObject {
       this.ctx.fillStyle = this.hovering ? '#f54340' : '#fe0f0a'
       this.ctx.strokeStyle = '#500910'
     } else {
-      this.ctx.fillStyle = this.hovering ? '#f2f057' : '#ebe834' 
-      this.ctx.strokeStyle = '#73722c'
+      if (this.junctionHeight === 'ground') {
+        this.ctx.fillStyle = this.hovering ? '#6b6b6b' : '#3d3d3d'
+        this.ctx.strokeStyle = '#2e2d2d'
+      } else {
+        this.ctx.fillStyle = this.hovering ? '#f2f057' : '#ebe834' 
+        this.ctx.strokeStyle = '#73722c'
+      }
     }
     if (recentlyClicked) {
       this.ctx.strokeStyle = '#d6d6d0'
