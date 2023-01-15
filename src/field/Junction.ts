@@ -1,10 +1,16 @@
-import FieldObject from "./FieldObject";
+import { Cone, JunctionHeight, Scores } from '../types'
+import FieldObject from './FieldObject'
 
-type JunctionHeight = 'ground' | 'short' | 'medium' | 'tall'
+const pointMap = Object.freeze({
+  ground: 2,
+  low: 3,
+  medium: 4,
+  high: 5
+})
 
 export default class Junction extends FieldObject {
-  cones: string[] = []
-  lastClicked: number = 0  
+  cones: Cone[] = []
+  lastClicked: number = 0
   junctionHeight: JunctionHeight
 
   constructor(x: number, y: number, canvas: HTMLCanvasElement, junctionHeight: JunctionHeight, radius: number = 15) {
@@ -26,7 +32,7 @@ export default class Junction extends FieldObject {
         this.ctx.fillStyle = this.hovering ? '#6b6b6b' : '#3d3d3d'
         this.ctx.strokeStyle = '#2e2d2d'
       } else {
-        this.ctx.fillStyle = this.hovering ? '#f2f057' : '#ebe834' 
+        this.ctx.fillStyle = this.hovering ? '#f2f057' : '#ebe834'
         this.ctx.strokeStyle = '#73722c'
       }
     }
@@ -50,5 +56,33 @@ export default class Junction extends FieldObject {
   }
   override isPointWithin(x: number, y: number): boolean {
     return Math.pow(this.x - x, 2) + Math.pow(this.y - y, 2) < Math.pow(this.width + 15, 2)
+  }
+
+  override getScores(): Scores {
+    const points = { blue: 0, red: 0 } as Scores
+    if (this.cones.length === 0) {
+      return points
+    }
+    const value = pointMap[this.junctionHeight]
+    for (let cone of this.cones) {
+      if (cone === 'blue') {
+        points.blue += value
+      } else if (cone === 'red') {
+        points.red += value
+      }
+    }
+
+    const top = this.cones[this.cones.length - 1]
+    if (top === 'blue') {
+      points.blue += 3
+    } else if (top === 'blue beacon') {
+      points.blue += 10
+    } else if (top === 'red') {
+      points.red += 3
+    } else {
+      points.red += 10
+    }
+
+    return points
   }
 }

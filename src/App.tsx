@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useEffect, useRef } from 'react'
 import './App.css'
 import { Box, ChakraProvider, Flex } from '@chakra-ui/react'
 import Canvas from './Canvas'
@@ -7,6 +7,7 @@ import { useState } from 'react'
 import { createYield } from 'typescript'
 import store from './store/store'
 import PowerPlayField from './field/PowerPlayField'
+import { Scores } from './types'
 
 let isInitialized = false
 
@@ -22,6 +23,7 @@ let field: PowerPlayField | null = null
 
 function App() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [scores, setScores] = useState<Scores>({ blue: 0, red: 0 })
 
   const draw = (ctx: CanvasRenderingContext2D, frame: number) => {
     const can = document.getElementById('canvas') as HTMLCanvasElement | null
@@ -80,13 +82,27 @@ function App() {
     // drawRotatedRect(ctx, 975, 422, 10, 90, 45, false)
   }
 
+  useEffect(() => {}, [scores])
+
+  const handleClick = () => {
+    console.log('click', Date.now())
+    if (field) {
+      console.log('updating')
+      field.updateScores()
+      console.log('finished')
+      setScores(s => field?.scores ?? s)
+      // todo: for some reason, red score doesnt update if a red cone is added immediately after a blue one
+    }
+  }
+
   return (
     <ChakraProvider>
       <Flex justifyContent='center' alignItems='center' h='100vh'>
         <Box w={{ base: '100vw', lg: '40vw' }} h={{ base: '100vw', lg: '40vw' }}>
-          {canvasRef && <Canvas draw={draw} />}
+          {canvasRef && <Canvas onClick={handleClick} draw={draw} />}
         </Box>
       </Flex>
+      {JSON.stringify(scores, null, 2)}
     </ChakraProvider>
   )
 }

@@ -1,3 +1,5 @@
+import { Scores } from '../types'
+
 export default abstract class FieldObject {
   x: number
   y: number
@@ -20,10 +22,13 @@ export default abstract class FieldObject {
 
   abstract isPointWithin(x: number, y: number): boolean
 
-  handleClick(e: MouseEvent): void {
-  }
+  handleClick(e: MouseEvent): void {}
 
   setHovering(hovering: boolean): void {
     this.hovering = hovering
+  }
+
+  getScores(): Scores {
+    return { blue: 0, red: 0 }
   }
 }

@@ -1,12 +1,14 @@
-import autoBind from "auto-bind";
-import FieldGround from "./FieldGround";
-import FieldObject from "./FieldObject";
-import MediumJunction from "./MediumJunction";
-import Junction from "./Junction";
-import ShortJunction from "./ShortJunction";
-import TallJunction from "./TallJunction";
-import GroundJunction from "./GroundJunction";
-import Corner from "./Corner";
+import autoBind from 'auto-bind'
+import FieldGround from './FieldGround'
+import FieldObject from './FieldObject'
+import MediumJunction from './MediumJunction'
+import Junction from './Junction'
+import LowJunction from './LowJunction'
+import HighJunction from './HighJunction'
+import GroundJunction from './GroundJunction'
+import Corner from './Corner'
+import { Scores } from '../types'
+import fieldSlice from '../store/fieldSlice'
 
 const getMousePos = (canvas: HTMLCanvasElement, evt: MouseEvent) => {
   var rect = canvas.getBoundingClientRect(), // abs. size of element
@@ -20,58 +22,60 @@ const getMousePos = (canvas: HTMLCanvasElement, evt: MouseEvent) => {
 }
 
 export default class PowerPlayField {
-  
-  junctions: Junction[][] = [[],[],[],[],[]]
+  junctions: Junction[][] = [[], [], [], [], []]
   objects: FieldObject[] = []
+
+  scores: Scores = { blue: 0, red: 0 }
+
   canvas: HTMLCanvasElement
-  
+
   constructor(canvas: HTMLCanvasElement) {
     autoBind(this)
     this.canvas = canvas
     document.addEventListener('contextmenu', e => {
       e.preventDefault()
-      const {x,y} = getMousePos(this.canvas, e)
+      const { x, y } = getMousePos(this.canvas, e)
       this.handleClick(x, y, e)
     })
     canvas.addEventListener('click', e => {
-      const {x,y} = getMousePos(this.canvas, e)
+      const { x, y } = getMousePos(this.canvas, e)
       this.handleClick(x, y, e)
     })
     canvas.addEventListener('mousemove', e => {
-      const {x,y} = getMousePos(this.canvas, e)
+      const { x, y } = getMousePos(this.canvas, e)
       this.handleMouseMove(x, y, e)
     })
     this.objects.push(new FieldGround(0, 0, 1000, 1000, canvas))
 
-    this.junctions[0].push(new GroundJunction(1000/6, 1000/6, canvas))
-    this.junctions[0].push(new ShortJunction(1000/6 * 2, 1000/6, canvas))
-    this.junctions[0].push(new MediumJunction(1000/6 * 3, 1000/6, canvas))
-    this.junctions[0].push(new ShortJunction(1000/6 * 4, 1000/6, canvas))
-    this.junctions[0].push(new GroundJunction(1000/6 * 5, 1000/6, canvas))
-    this.junctions[1].push(new ShortJunction(1000/6 * 1, 1000/6 * 2, canvas))
-    this.junctions[1].push(new MediumJunction(1000/6 * 2, 1000/6 * 2, canvas))
-    this.junctions[1].push(new TallJunction(1000/6 * 3, 1000/6 * 2, canvas))
-    this.junctions[1].push(new MediumJunction(1000/6 * 4, 1000/6 * 2, canvas))
-    this.junctions[1].push(new ShortJunction(1000/6 * 5, 1000/6 * 2, canvas))
-    this.junctions[2].push(new MediumJunction(1000/6 * 1, 1000/6 * 3, canvas))
-    this.junctions[2].push(new TallJunction(1000/6 * 2, 1000/6 * 3, canvas))
-    this.junctions[2].push(new GroundJunction(1000/6 * 3, 1000/6 * 3, canvas))
-    this.junctions[2].push(new TallJunction(1000/6 * 4, 1000/6 * 3, canvas))
-    this.junctions[2].push(new MediumJunction(1000/6 * 5, 1000/6 * 3, canvas))
-    this.junctions[3].push(new ShortJunction(1000/6 * 1, 1000/6 * 4, canvas))
-    this.junctions[3].push(new MediumJunction(1000/6 * 2, 1000/6 * 4, canvas))
-    this.junctions[3].push(new TallJunction(1000/6 * 3, 1000/6 * 4, canvas))
-    this.junctions[3].push(new MediumJunction(1000/6 * 4, 1000/6 * 4, canvas))
-    this.junctions[3].push(new ShortJunction(1000/6 * 5, 1000/6 * 4, canvas))
-    this.junctions[4].push(new GroundJunction(1000/6 * 1, 1000/6 * 5, canvas))
-    this.junctions[4].push(new ShortJunction(1000/6 * 2, 1000/6 * 5, canvas))
-    this.junctions[4].push(new MediumJunction(1000/6 * 3, 1000/6 * 5, canvas))
-    this.junctions[4].push(new ShortJunction(1000/6 * 4, 1000/6 * 5, canvas))
-    this.junctions[4].push(new GroundJunction(1000/6 * 5, 1000/6 * 5, canvas))
-  
-    this.objects.push(new Corner(0, 1000/6 * 5, canvas, 'blue'))
-    this.objects.push(new Corner(1000/6 * 5, 0, canvas, 'blue', true))
-    this.objects.push(new Corner(1000/6 * 5, 1000/6 * 5, canvas, 'red'))
+    this.junctions[0].push(new GroundJunction(1000 / 6, 1000 / 6, canvas))
+    this.junctions[0].push(new LowJunction((1000 / 6) * 2, 1000 / 6, canvas))
+    this.junctions[0].push(new MediumJunction((1000 / 6) * 3, 1000 / 6, canvas))
+    this.junctions[0].push(new LowJunction((1000 / 6) * 4, 1000 / 6, canvas))
+    this.junctions[0].push(new GroundJunction((1000 / 6) * 5, 1000 / 6, canvas))
+    this.junctions[1].push(new LowJunction((1000 / 6) * 1, (1000 / 6) * 2, canvas))
+    this.junctions[1].push(new MediumJunction((1000 / 6) * 2, (1000 / 6) * 2, canvas))
+    this.junctions[1].push(new HighJunction((1000 / 6) * 3, (1000 / 6) * 2, canvas))
+    this.junctions[1].push(new MediumJunction((1000 / 6) * 4, (1000 / 6) * 2, canvas))
+    this.junctions[1].push(new LowJunction((1000 / 6) * 5, (1000 / 6) * 2, canvas))
+    this.junctions[2].push(new MediumJunction((1000 / 6) * 1, (1000 / 6) * 3, canvas))
+    this.junctions[2].push(new HighJunction((1000 / 6) * 2, (1000 / 6) * 3, canvas))
+    this.junctions[2].push(new GroundJunction((1000 / 6) * 3, (1000 / 6) * 3, canvas))
+    this.junctions[2].push(new HighJunction((1000 / 6) * 4, (1000 / 6) * 3, canvas))
+    this.junctions[2].push(new MediumJunction((1000 / 6) * 5, (1000 / 6) * 3, canvas))
+    this.junctions[3].push(new LowJunction((1000 / 6) * 1, (1000 / 6) * 4, canvas))
+    this.junctions[3].push(new MediumJunction((1000 / 6) * 2, (1000 / 6) * 4, canvas))
+    this.junctions[3].push(new HighJunction((1000 / 6) * 3, (1000 / 6) * 4, canvas))
+    this.junctions[3].push(new MediumJunction((1000 / 6) * 4, (1000 / 6) * 4, canvas))
+    this.junctions[3].push(new LowJunction((1000 / 6) * 5, (1000 / 6) * 4, canvas))
+    this.junctions[4].push(new GroundJunction((1000 / 6) * 1, (1000 / 6) * 5, canvas))
+    this.junctions[4].push(new LowJunction((1000 / 6) * 2, (1000 / 6) * 5, canvas))
+    this.junctions[4].push(new MediumJunction((1000 / 6) * 3, (1000 / 6) * 5, canvas))
+    this.junctions[4].push(new LowJunction((1000 / 6) * 4, (1000 / 6) * 5, canvas))
+    this.junctions[4].push(new GroundJunction((1000 / 6) * 5, (1000 / 6) * 5, canvas))
+
+    this.objects.push(new Corner(0, (1000 / 6) * 5, canvas, 'blue'))
+    this.objects.push(new Corner((1000 / 6) * 5, 0, canvas, 'blue', true))
+    this.objects.push(new Corner((1000 / 6) * 5, (1000 / 6) * 5, canvas, 'red'))
     this.objects.push(new Corner(0, 0, canvas, 'red', true))
   }
 
@@ -82,9 +86,9 @@ export default class PowerPlayField {
 
   handleClick(x: number, y: number, e: MouseEvent): void {
     for (let row of this.junctions) {
-      for (let pole of row) {
-        if (pole.isPointWithin(x, y)) {
-          pole.handleClick(e)
+      for (let junction of row) {
+        if (junction.isPointWithin(x, y)) {
+          junction.handleClick(e)
           return
         }
       }
@@ -96,16 +100,33 @@ export default class PowerPlayField {
       }
     }
   }
-  
+
   handleMouseMove(x: number, y: number, e: MouseEvent): void {
     for (let row of this.junctions) {
       for (let junction of row) {
-        junction.setHovering(junction.isPointWithin(x,y))
+        junction.setHovering(junction.isPointWithin(x, y))
       }
     }
     for (let obj of this.objects) {
-      obj.setHovering(obj.isPointWithin(x,y))
+      obj.setHovering(obj.isPointWithin(x, y))
     }
   }
 
+  // todo: could optimize by only calculating this on change
+  updateScores(): void {
+    const scores = { blue: 0, red: 0 } as Scores
+    for (let row of this.junctions) {
+      for (let junction of row) {
+        const p = junction.getScores()
+        scores.blue += p.blue
+        scores.red += p.red
+      }
+    }
+    for (let obj of this.objects) {
+      const p = obj.getScores()
+      scores.blue += p.blue
+      scores.red += p.red
+    }
+    this.scores = scores
+  }
 }
