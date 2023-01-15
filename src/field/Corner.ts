@@ -36,12 +36,12 @@ const drawRotatedRect = (
 
 type Color = 'red' | 'blue'
 
-export default class Corner extends FieldObject  {
+export default class Corner extends FieldObject {
   isTop: boolean
   color: Color
-  
+
   constructor(x: number, y: number, canvas: HTMLCanvasElement, color: Color, isTop: boolean = false) {
-    super(x, y, 1000/6, 1000/6, canvas)
+    super(x, y, 1000 / 6, 1000 / 6, canvas)
     this.isTop = isTop
     this.color = color
   }
@@ -67,8 +67,8 @@ export default class Corner extends FieldObject  {
         this.ctx.lineTo(this.x, this.y)
       }
     }
-    this.ctx.fill();
-    
+    this.ctx.fill()
+
     if (this.color === 'blue') {
       this.ctx.fillStyle = '#0a0ef2'
       this.ctx.strokeStyle = '#0a0a75'
@@ -84,10 +84,12 @@ export default class Corner extends FieldObject  {
   }
 
   isPointWithin(x: number, y: number): boolean {
-    // todo: not working for bottom left
-    if ((this.isTop && this.color === 'blue') || (!this.isTop && this.color === 'red')) {
-      return x >= this.x && y >= this.y && x <= this.x + this.width && y <= this.y + this.height && (x - this.x + y - this.y) >= this.width
+    if (x < this.x || x > this.x + this.width || y < this.y || y > this.y + this.height) {
+      return false
     }
-    return x >= this.x && y >= this.y && (x - this.x + y - this.y) <= this.width
+
+    let xCornerDist = this.isTop !== (this.color === 'blue') ? x - this.x : this.x + this.width - x
+    let yCornerDist = this.isTop ? y - this.y : this.y + this.height - y
+    return xCornerDist + yCornerDist <= this.width
   }
 }
