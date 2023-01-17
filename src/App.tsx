@@ -86,13 +86,12 @@ function App() {
 
   const handleClick = () => {
     console.log('click', Date.now())
-    if (field) {
-      console.log('updating')
-      field.updateScores()
-      console.log('finished')
-      setScores(s => field?.scores ?? s)
-      // todo: for some reason, red score doesnt update if a red cone is added immediately after a blue one
-    }
+    setTimeout(() => {
+      if (field) {
+        field.updateScores()
+        setScores(s => field?.scores ?? s)
+      }
+    }, 0)
   }
 
   return (

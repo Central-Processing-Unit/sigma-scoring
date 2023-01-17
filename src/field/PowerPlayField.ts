@@ -8,7 +8,6 @@ import HighJunction from './HighJunction'
 import GroundJunction from './GroundJunction'
 import Corner from './Corner'
 import { Scores } from '../types'
-import fieldSlice from '../store/fieldSlice'
 
 const getMousePos = (canvas: HTMLCanvasElement, evt: MouseEvent) => {
   var rect = canvas.getBoundingClientRect(), // abs. size of element
@@ -23,6 +22,7 @@ const getMousePos = (canvas: HTMLCanvasElement, evt: MouseEvent) => {
 
 export default class PowerPlayField {
   junctions: Junction[][] = [[], [], [], [], []]
+  corners: Corner[] = []
   objects: FieldObject[] = []
 
   scores: Scores = { blue: 0, red: 0 }
@@ -73,15 +73,16 @@ export default class PowerPlayField {
     this.junctions[4].push(new LowJunction((1000 / 6) * 4, (1000 / 6) * 5, canvas))
     this.junctions[4].push(new GroundJunction((1000 / 6) * 5, (1000 / 6) * 5, canvas))
 
-    this.objects.push(new Corner(0, (1000 / 6) * 5, canvas, 'blue'))
-    this.objects.push(new Corner((1000 / 6) * 5, 0, canvas, 'blue', true))
-    this.objects.push(new Corner((1000 / 6) * 5, (1000 / 6) * 5, canvas, 'red'))
-    this.objects.push(new Corner(0, 0, canvas, 'red', true))
+    this.corners.push(new Corner(0, (1000 / 6) * 5, canvas, 'blue'))
+    this.corners.push(new Corner((1000 / 6) * 5, 0, canvas, 'blue', true))
+    this.corners.push(new Corner((1000 / 6) * 5, (1000 / 6) * 5, canvas, 'red'))
+    this.corners.push(new Corner(0, 0, canvas, 'red', true))
   }
 
   render(): void {
     this.objects.forEach(o => o.render())
     this.junctions.forEach(row => row.forEach(junction => junction.render()))
+    this.corners.forEach(c => c.render())
   }
 
   handleClick(x: number, y: number, e: MouseEvent): void {
@@ -91,6 +92,12 @@ export default class PowerPlayField {
           junction.handleClick(e)
           return
         }
+      }
+    }
+    for (let corner of this.corners) {
+      if (corner.isPointWithin(x, y)) {
+        corner.handleClick(e)
+        return
       }
     }
     for (let obj of this.objects) {
@@ -106,6 +113,9 @@ export default class PowerPlayField {
       for (let junction of row) {
         junction.setHovering(junction.isPointWithin(x, y))
       }
+    }
+    for (let corner of this.corners) {
+      corner.setHovering(corner.isPointWithin(x, y))
     }
     for (let obj of this.objects) {
       obj.setHovering(obj.isPointWithin(x, y))
@@ -128,5 +138,6 @@ export default class PowerPlayField {
       scores.red += p.red
     }
     this.scores = scores
+    console.log('new scores:', scores)
   }
 }

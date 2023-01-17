@@ -11,6 +11,7 @@ const pointMap = Object.freeze({
 export default class Junction extends FieldObject {
   cones: Cone[] = []
   lastClicked: number = 0
+  lastDeleted: number = 0
   junctionHeight: JunctionHeight
 
   constructor(x: number, y: number, canvas: HTMLCanvasElement, junctionHeight: JunctionHeight, radius: number = 15) {
@@ -20,7 +21,6 @@ export default class Junction extends FieldObject {
 
   render(): void {
     const ownership = this.cones.length !== 0 ? this.cones[this.cones.length - 1] : 'none'
-    const recentlyClicked = Date.now() - this.lastClicked < 500
     if (ownership === 'blue') {
       this.ctx.fillStyle = this.hovering ? '#4e51f5' : '#0a0ef2'
       this.ctx.strokeStyle = '#0a0a75'
@@ -36,8 +36,13 @@ export default class Junction extends FieldObject {
         this.ctx.strokeStyle = '#73722c'
       }
     }
+    const recentlyClicked = Date.now() - this.lastClicked < 500
     if (recentlyClicked) {
       this.ctx.strokeStyle = '#d6d6d0'
+    }
+    const recentlyDeleted = Date.now() - this.lastDeleted < 500
+    if (recentlyDeleted) {
+      this.ctx.strokeStyle = '#f57269'
     }
     this.ctx.beginPath()
     this.ctx.arc(this.x, this.y, this.width, 0, 2 * Math.PI, false)
@@ -47,6 +52,11 @@ export default class Junction extends FieldObject {
   }
 
   override handleClick(e: MouseEvent): void {
+    if (e.ctrlKey) {
+      this.cones.pop()
+      this.lastDeleted = Date.now()
+      return
+    }
     if (e.button === 0) {
       this.cones.push('blue')
     } else if (e.button === 2) {
