@@ -84,7 +84,7 @@ export default class Corner extends FieldObject {
     if (this.color === 'red') {
       yPos -= 100
     }
-    drawRotatedRect(this.ctx, this.x + 125, yPos, 15, 400, this.color === 'blue' ? -45 : 45) // Bottom left corner
+    drawRotatedRect(this.ctx, this.x + 125, yPos, 15, 400, this.color === 'blue' ? -45 : 45)
 
     const ownership = this.cones.length !== 0 ? this.cones[this.cones.length - 1] : 'none'
     if (ownership !== 'none') {
@@ -104,8 +104,8 @@ export default class Corner extends FieldObject {
         this.ctx.strokeStyle = '#f57269'
       }
       this.ctx.beginPath()
-      const cy = this.isTop ? 1000/24 : 3 * 1000/24
-      const cx = this.isTop !== (this.color === 'blue') ? 1000/24 : 3 * 1000/24
+      const cy = this.isTop ? 1000 / 24 : (3 * 1000) / 24
+      const cx = this.isTop !== (this.color === 'blue') ? 1000 / 24 : (3 * 1000) / 24
       this.ctx.arc(this.x + cx, this.y + cy, 15, 0, 2 * Math.PI, false)
       this.ctx.fill()
       this.ctx.stroke()
