@@ -1,85 +1,28 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import './App.css'
-import { Box, ChakraProvider, Flex } from '@chakra-ui/react'
+import { Box, ChakraProvider, Flex, Heading, Text } from '@chakra-ui/react'
 import Canvas from './Canvas'
-import { Provider } from 'react-redux'
 import { useState } from 'react'
-import { createYield } from 'typescript'
-import store from './store/store'
+import { GlobalHotKeys } from 'react-hotkeys'
 import PowerPlayField from './field/PowerPlayField'
-import { Scores } from './types'
-
-let isInitialized = false
-
-const drawCircle = (ctx: CanvasRenderingContext2D, x: number, y: number, radius: number) => {
-  ctx.beginPath()
-  ctx.arc(x, y, 15, 0, 2 * Math.PI, false)
-  ctx.fill()
-  ctx.lineWidth = 5
-  ctx.stroke()
-}
+import { Period, Scores } from './types'
+import capitalize from './capitalize'
 
 let field: PowerPlayField | null = null
 
 function App() {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
   const [scores, setScores] = useState<Scores>({ blue: 0, red: 0 })
+  const [period, setPeriod] = useState<Period>('autonomous')
 
   const draw = (ctx: CanvasRenderingContext2D, frame: number) => {
-    const can = document.getElementById('canvas') as HTMLCanvasElement | null
-    if (!can) {
+    const canvas = document.getElementById('canvas') as HTMLCanvasElement | null
+    if (!canvas) {
       return
     }
     if (!field) {
-      field = new PowerPlayField(can)
+      field = new PowerPlayField(canvas)
     }
     field.render()
-    // const width = can.width
-    // const height = can.height
-    // ctx.fillStyle = '#a1a1a1'
-    // ctx.fillRect(0, 0, width, height)
-    // ctx.fillStyle = '#ebe834'
-    // ctx.strokeStyle = '#73722c'
-    // for (let i = 1; i < 6; i++) {
-    //   ctx.fillStyle = '#3e3e3e'
-    //   ctx.fillRect((i * can.width) / 6 - 3, 0, 6, can.height)
-    //   ctx.fillRect(0, (i * can.height) / 6 - 3, can.width, 6)
-    // }
-    // for (let i = 1; i < 6; i++) {
-    //   ctx.fillStyle = '#ebe834'
-    //   ctx.strokeStyle = '#73722c'
-    //   for (let j = 1; j < 6; j++) {
-    //     drawCircle(ctx, (i * can.width) / 6, (j * can.height) / 6, 15)
-    //     drawCircle(ctx, (i * can.width) / 6, (j * can.height) / 6, 15)
-    //   }
-    // }
-    // ctx.fillStyle = '#0a0ef2'
-    // ctx.strokeStyle = '#0a0a75'
-    // ctx.fillRect((5 / 12) * can.width - 10, 0, 20, can.height / 6)
-    // ctx.strokeRect((5 / 12) * can.width - 10, 0, 20, can.height / 6)
-    // ctx.fillRect((5 / 12) * can.width - 10, (5 / 6) * can.height, 20, can.height / 6)
-    // ctx.strokeRect((5 / 12) * can.width - 10, (5 / 6) * can.height, 20, can.height / 6)
-    // drawRotatedRect(ctx, 125, 780, 15, 400, -45) // Bottom left corner
-    // drawRotatedRect(ctx, 875, -165, 15, 400, -45) // Top right corner
-
-    // // Left triangle
-    // drawRotatedRect(ctx, 25, 415, 15, 100, -45)
-    // drawRotatedRect(ctx, 25, 475, 15, 100, 45)
-    // drawRotatedRect(ctx, 30, 422, 10, 90, -45, false)
-
-    // ctx.fillStyle = '#fe0f0a'
-    // ctx.strokeStyle = '#500910'
-    // ctx.fillRect((7 / 12) * can.width - 10, 0, 20, can.height / 6)
-    // ctx.strokeRect((7 / 12) * can.width - 10, 0, 20, can.height / 6)
-    // ctx.fillRect((7 / 12) * can.width - 10, (5 / 6) * can.height, 20, can.height / 6)
-    // ctx.strokeRect((7 / 12) * can.width - 10, (5 / 6) * can.height, 20, can.height / 6)
-    // drawRotatedRect(ctx, 125, -175, 15, 400, 45) // Top left corner
-    // drawRotatedRect(ctx, 875, 760, 15, 400, 45) // Bottom right corner
-
-    // // Right triangle
-    // drawRotatedRect(ctx, 975, 415, 15, 100, 45)
-    // drawRotatedRect(ctx, 975, 475, 15, 100, -45)
-    // drawRotatedRect(ctx, 975, 422, 10, 90, 45, false)
   }
 
   useEffect(() => {}, [scores])
@@ -94,14 +37,58 @@ function App() {
     }, 0)
   }
 
+  const handleContinue = useCallback(
+    (e?: KeyboardEvent) => {
+      if (e) {
+        e.preventDefault()
+      }
+      console.log('space', period)
+      if (period === 'autonomous') {
+        console.log('state')
+        setPeriod('teleop')
+      } else {
+        console.log('test')
+        const canvas = document.getElementById('canvas') as HTMLCanvasElement | null
+        if (canvas) {
+          field = new PowerPlayField(canvas)
+          setPeriod('autonomous')
+        }
+      }
+    },
+    [period, setPeriod]
+  )
+
+  const handlers = {
+    CONTINUE: handleContinue // todo: this callback isn't getting the current value of period :(
+  }
+
+  const keyMap = {
+    CONTINUE: ['space']
+  }
+
+  console.log(period)
   return (
     <ChakraProvider>
-      <Flex justifyContent='center' alignItems='center' h='100vh'>
-        <Box w={{ base: '100vw', lg: '40vw' }} h={{ base: '100vw', lg: '40vw' }}>
-          {canvasRef && <Canvas onClick={handleClick} draw={draw} />}
-        </Box>
-      </Flex>
-      {JSON.stringify(scores, null, 2)}
+      <GlobalHotKeys keyMap={keyMap} handlers={handlers}>
+        <Flex justifyContent='center' alignItems='center' h='100vh' fontFamily='mplus'>
+          <Box>
+            <Flex justifyContent='center' mb='10px'>
+              <Heading fontFamily='mplus'>Sigma Scoring</Heading>
+            </Flex>
+            <Box w={{ base: '90vw', lg: '80vh' }} h={{ base: '90vw', lg: '80vh' }}>
+              {<Canvas onClick={handleClick} draw={draw} />}
+            </Box>
+            <Flex justifyContent='center'>
+              <Box>
+                <Heading textAlign='center' fontFamily='mplus'>
+                  {capitalize(period)}
+                </Heading>
+                <Text textAlign='center'>Press space {period === 'autonomous' ? 'for Teleop' : 'to reset'}</Text>
+              </Box>
+            </Flex>
+          </Box>
+        </Flex>
+      </GlobalHotKeys>
     </ChakraProvider>
   )
 }
