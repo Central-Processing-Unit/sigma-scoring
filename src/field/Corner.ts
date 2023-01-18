@@ -1,50 +1,15 @@
-import { Cone, Scores } from '../types'
+import drawRotatedRect from '../drawRotatedRect'
+import { Cone, Scores, TeamColor } from '../types'
 import FieldObject from './FieldObject'
-
-const drawRotatedRect = (
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  degrees: number,
-  stroke = true
-) => {
-  // first save the untranslated/unrotated context
-  ctx.save()
-
-  ctx.beginPath()
-  // move the rotation point to the center of the rect
-  ctx.translate(x + width / 2, y + height / 2)
-  // ctx.translate(x + width, y + height)
-  // rotate the rect
-  ctx.rotate((degrees * Math.PI) / 180)
-
-  // draw the rect on the transformed context
-  // Note: after transforming [0,0] is visually [x,y]
-  //       so the rect needs to be offset accordingly when drawn
-  ctx.rect(-width / 2, -height / 2, width, height)
-  // ctx.rect(-width, -height, width, height)
-
-  ctx.fill()
-  if (stroke) {
-    ctx.stroke()
-  }
-
-  // restore the context to its untranslated/unrotated state
-  ctx.restore()
-}
-
-type Color = 'red' | 'blue'
 
 export default class Corner extends FieldObject {
   cones: Cone[] = []
   lastClicked: number = 0
   lastDeleted: number = 0
   isTop: boolean
-  color: Color
+  color: TeamColor
 
-  constructor(x: number, y: number, canvas: HTMLCanvasElement, color: Color, isTop: boolean = false) {
+  constructor(x: number, y: number, canvas: HTMLCanvasElement, color: TeamColor, isTop: boolean = false) {
     super(x, y, 1000 / 6, 1000 / 6, canvas)
     this.isTop = isTop
     this.color = color
@@ -117,8 +82,8 @@ export default class Corner extends FieldObject {
       return false
     }
 
-    let xCornerDist = this.isTop !== (this.color === 'blue') ? x - this.x : this.x + this.width - x
-    let yCornerDist = this.isTop ? y - this.y : this.y + this.height - y
+    const xCornerDist = this.isTop !== (this.color === 'blue') ? x - this.x : this.x + this.width - x
+    const yCornerDist = this.isTop ? y - this.y : this.y + this.height - y
     return xCornerDist + yCornerDist <= this.width
   }
 

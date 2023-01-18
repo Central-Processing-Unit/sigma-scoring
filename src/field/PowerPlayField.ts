@@ -8,6 +8,7 @@ import HighJunction from './HighJunction'
 import GroundJunction from './GroundJunction'
 import Corner from './Corner'
 import { Scores, TeamColor } from '../types'
+import Substation from './Substation'
 
 const getMousePos = (canvas: HTMLCanvasElement, evt: MouseEvent) => {
   var rect = canvas.getBoundingClientRect(), // abs. size of element
@@ -79,6 +80,9 @@ export default class PowerPlayField {
     this.corners.push(new Corner((1000 / 6) * 5, 0, canvas, 'blue', true))
     this.corners.push(new Corner((1000 / 6) * 5, (1000 / 6) * 5, canvas, 'red'))
     this.corners.push(new Corner(0, 0, canvas, 'red', true))
+
+    this.objects.push(new Substation(0, 1000 / 2, canvas, 'blue'))
+    this.objects.push(new Substation(1000, 1000 / 2, canvas, 'red'))
   }
 
   render(): void {
