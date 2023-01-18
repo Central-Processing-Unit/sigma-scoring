@@ -1,4 +1,4 @@
-import { Cone, JunctionHeight, Scores } from '../types'
+import { Cone, JunctionHeight, Scores, TeamColor } from '../types'
 import FieldObject from './FieldObject'
 
 const pointMap = Object.freeze({
@@ -21,10 +21,10 @@ export default class Junction extends FieldObject {
 
   render(): void {
     const ownership = this.cones.length !== 0 ? this.cones[this.cones.length - 1] : 'none'
-    if (ownership === 'blue') {
+    if (ownership === 'blue' || ownership === 'blue beacon') {
       this.ctx.fillStyle = this.hovering ? '#4e51f5' : '#0a0ef2'
       this.ctx.strokeStyle = '#0a0a75'
-    } else if (ownership === 'red') {
+    } else if (ownership === 'red' || ownership === 'red beacon') {
       this.ctx.fillStyle = this.hovering ? '#f54340' : '#fe0f0a'
       this.ctx.strokeStyle = '#500910'
     } else {
@@ -44,26 +44,65 @@ export default class Junction extends FieldObject {
     if (recentlyDeleted) {
       this.ctx.strokeStyle = '#f57269'
     }
-    this.ctx.beginPath()
-    this.ctx.arc(this.x, this.y, this.width, 0, 2 * Math.PI, false)
-    this.ctx.fill()
-    this.ctx.lineWidth = 5
-    this.ctx.stroke()
+    if (ownership.includes('beacon')) {
+      this.ctx.fillRect(this.x - 15, this.y - 15, 30, 30)
+      this.ctx.strokeRect(this.x - 15, this.y - 15, 30, 30)
+    } else {
+      this.ctx.beginPath()
+      this.ctx.arc(this.x, this.y, this.width, 0, 2 * Math.PI, false)
+      this.ctx.fill()
+      this.ctx.lineWidth = 5
+      this.ctx.stroke()
+    }
   }
 
-  override handleClick(e: MouseEvent): void {
+  handleJunctionClick(
+    e: MouseEvent,
+    canPlaceBlueBeacon: boolean,
+    canPlaceRedBeacon: boolean,
+    onBeaconUpdate: (color: TeamColor, isPlaced: boolean) => void
+  ): void {
     if (e.ctrlKey) {
-      this.cones.pop()
+      const cone = this.cones.pop()
+      if (cone === 'blue beacon') {
+        onBeaconUpdate('blue', false)
+      } else if (cone === 'red beacon') {
+        onBeaconUpdate('red', false)
+      }
       this.lastDeleted = Date.now()
       return
     }
+    if (this.cones.length && this.cones[this.cones.length - 1].includes('beacon')) {
+      return
+    }
     if (e.button === 0) {
-      this.cones.push('blue')
+      if (e.altKey) {
+        if (!canPlaceBlueBeacon) {
+          return
+        }
+        onBeaconUpdate('blue', true)
+        this.cones.push('blue beacon')
+      } else {
+        this.cones.push('blue')
+      }
     } else if (e.button === 2) {
-      this.cones.push('red')
+      if (e.altKey) {
+        if (!canPlaceRedBeacon) {
+          return
+        }
+        onBeaconUpdate('red', true)
+        this.cones.push('red beacon')
+      } else {
+        this.cones.push('red')
+      }
     }
     this.lastClicked = Date.now()
   }
+
+  override handleClick(e: MouseEvent): void {
+    this.handleJunctionClick(e, false, false, () => {})
+  }
+
   override isPointWithin(x: number, y: number): boolean {
     return Math.pow(this.x - x, 2) + Math.pow(this.y - y, 2) < Math.pow(this.width + 15, 2)
   }
