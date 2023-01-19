@@ -1,6 +1,15 @@
 export interface Scores {
-  red: number
   blue: number
+  red: number
+}
+
+export interface ScoreReport {
+  blue: number
+  red: number
+  blueAuton: number
+  redAuton: number
+  blueTeleOp: number
+  redTeleOp: number
 }
 
 export type JunctionHeight = 'ground' | 'low' | 'medium' | 'high'

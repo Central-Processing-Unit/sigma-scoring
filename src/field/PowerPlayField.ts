@@ -7,7 +7,7 @@ import LowJunction from './LowJunction'
 import HighJunction from './HighJunction'
 import GroundJunction from './GroundJunction'
 import Corner from './Corner'
-import { Scores, TeamColor } from '../types'
+import { Period, Scores, TeamColor } from '../types'
 import Substation from './Substation'
 
 const getMousePos = (canvas: HTMLCanvasElement, evt: MouseEvent) => {
@@ -29,6 +29,10 @@ export default class PowerPlayField {
   scores: Scores = { blue: 0, red: 0 }
   isBlueBeaconPlaced = false
   isRedBeaconPlaced = false
+  autonomousScores: Scores = { blue: 0, red: 0 }
+  autonomousDuplicatePoints: Scores = { blue: 0, red: 0 } // for cones that are scored in autonomous. they need to be double-counted
+
+  period: Period = 'autonomous'
 
   canvas: HTMLCanvasElement
 
@@ -138,20 +142,47 @@ export default class PowerPlayField {
 
   // todo: could optimize by only calculating this on change
   updateScores(): void {
-    const scores = { blue: 0, red: 0 } as Scores
+    const scores = { blue: this.autonomousDuplicatePoints.blue, red: this.autonomousDuplicatePoints.red } as Scores
     for (let row of this.junctions) {
       for (let junction of row) {
-        const p = junction.getScores()
-        scores.blue += p.blue
-        scores.red += p.red
+        const s = junction.getScores()
+        scores.blue += s.blue
+        scores.red += s.red
       }
     }
+    for (let corner of this.corners) {
+      const s = corner.getScores()
+      scores.blue += s.blue
+      scores.red += s.red
+    }
     for (let obj of this.objects) {
-      const p = obj.getScores()
-      scores.blue += p.blue
-      scores.red += p.red
+      const s = obj.getScores()
+      scores.blue += s.blue
+      scores.red += s.red
     }
     this.scores = scores
-    console.log('new scores:', scores)
+  }
+
+  startTeleOp(): void {
+    if (this.period !== 'autonomous') {
+      return
+    }
+    console.log('startTeleop')
+    for (let row of this.junctions) {
+      for (let junction of row) {
+        const s = junction.getAutonomousScores()
+        console.log(s.blue)
+        this.autonomousDuplicatePoints.blue += s.blue
+        this.autonomousDuplicatePoints.red += s.red
+      }
+    }
+    for (let corner of this.corners) {
+      const s = corner.getScores()
+      this.autonomousDuplicatePoints.blue += s.blue
+      this.autonomousDuplicatePoints.red += s.red
+    }
+    this.autonomousScores = this.autonomousDuplicatePoints
+    this.updateScores()
+    this.period = 'teleop'
   }
 }

@@ -5,7 +5,7 @@ import Canvas from './Canvas'
 import { useState } from 'react'
 import { GlobalHotKeys } from 'react-hotkeys'
 import PowerPlayField from './field/PowerPlayField'
-import { Period, Scores } from './types'
+import { Period, ScoreReport, Scores } from './types'
 import capitalize from './capitalize'
 import LeftPanel from './LeftPanel'
 import RightPanel from './RightPanel'
@@ -13,7 +13,14 @@ import RightPanel from './RightPanel'
 let field: PowerPlayField | null = null
 
 function App() {
-  const [scores, setScores] = useState<Scores>({ blue: 0, red: 0 })
+  const [scores, setScores] = useState<ScoreReport>({
+    blue: 0,
+    red: 0,
+    blueAuton: 0,
+    redAuton: 0,
+    blueTeleOp: 0,
+    redTeleOp: 0
+  })
   const [period, setPeriod] = useState<Period>('autonomous')
 
   const draw = (ctx: CanvasRenderingContext2D, frame: number) => {
@@ -31,12 +38,33 @@ function App() {
 
   const handleClick = () => {
     console.log('click', Date.now())
-    setTimeout(() => {
-      if (field) {
-        field.updateScores()
-        setScores(s => field?.scores ?? s)
+    setTimeout(copyScores, 0)
+  }
+
+  const copyScores = () => {
+    if (!field) {
+      return
+    }
+    field.updateScores()
+    setScores(s => {
+      if (!field) {
+        return s
       }
-    }, 0)
+      const { blue, red } = field.scores
+      let { blue: blueAuton, red: redAuton } = field.autonomousScores
+      if (field.period === 'autonomous') {
+        blueAuton = blue
+        redAuton = red
+      }
+      return {
+        blue,
+        red,
+        blueAuton,
+        redAuton,
+        blueTeleOp: field.period === 'autonomous' ? 0 : blue - blueAuton,
+        redTeleOp: field.period === 'autonomous' ? 0 : red - redAuton
+      }
+    })
   }
 
   const handleContinue = useCallback(
@@ -47,9 +75,19 @@ function App() {
       console.log('space', period)
       setPeriod(p => {
         if (p === 'autonomous') {
+          field?.startTeleOp()
+          setTimeout(copyScores, 0)
           return 'teleop'
         }
         const canvas = document.getElementById('canvas') as HTMLCanvasElement | null
+        setScores({
+          blue: 0,
+          red: 0,
+          blueAuton: 0,
+          redAuton: 0,
+          blueTeleOp: 0,
+          redTeleOp: 0
+        })
         if (canvas) {
           field = new PowerPlayField(canvas)
           return 'autonomous'
@@ -69,14 +107,13 @@ function App() {
   }
 
   // todo: show cones visually on hover on a side panel
-  console.log(period)
   return (
     <ChakraProvider>
       <GlobalHotKeys keyMap={keyMap} handlers={handlers}>
         <Flex px='7vw' justifyContent='space-between' alignItems='center' h='100vh' fontFamily='mplus'>
           <Box w='15vw' h={{ base: '90vw', lg: '80vh' }} border='8px solid #0a0ef2' outline='2px solid black'>
             <Box w='100%' h='100%' outline='2px solid black'>
-              <LeftPanel blueScore={scores.blue} />
+              <LeftPanel scores={scores} />
             </Box>
           </Box>
           <Box>
@@ -97,7 +134,7 @@ function App() {
           </Box>
           <Box w='15vw' h={{ base: '90vw', lg: '80vh' }} border='8px solid #fe0f0a' outline='2px solid black'>
             <Box w='100%' h='100%' outline='2px solid black'>
-              <RightPanel redScore={scores.red} />
+              <RightPanel scores={scores} />
             </Box>
           </Box>
         </Flex>

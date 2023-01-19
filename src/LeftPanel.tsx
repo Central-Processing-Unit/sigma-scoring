@@ -1,16 +1,19 @@
-import { Box, Heading } from '@chakra-ui/react'
+import { Box, Heading, Text } from '@chakra-ui/react'
 import React, { FC } from 'react'
+import { ScoreReport } from './types'
 
 interface Props {
-  blueScore: number
+  scores: ScoreReport
 }
 
-const LeftPanel: FC<Props> = ({ blueScore }) => {
+const LeftPanel: FC<Props> = ({ scores }) => {
   return (
     <Box p='10px'>
       <Heading as='h6' fontSize='28px'>
-        Blue Score: {blueScore}
+        Blue Score: {scores.blue}
       </Heading>
+      <Text fontSize='18px'>Autonomous: {scores.blueAuton}</Text>
+      <Text fontSize='18px'>Teleop: {scores.blueTeleOp}</Text>
     </Box>
   )
 }

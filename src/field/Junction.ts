@@ -107,31 +107,47 @@ export default class Junction extends FieldObject {
     return Math.pow(this.x - x, 2) + Math.pow(this.y - y, 2) < Math.pow(this.width + 15, 2)
   }
 
-  override getScores(): Scores {
-    const points = { blue: 0, red: 0 } as Scores
+  getAutonomousScores(): Scores {
+    const scores = { blue: 0, red: 0 } as Scores
     if (this.cones.length === 0) {
-      return points
+      return scores
     }
     const value = pointMap[this.junctionHeight]
     for (let cone of this.cones) {
       if (cone === 'blue') {
-        points.blue += value
+        scores.blue += value
       } else if (cone === 'red') {
-        points.red += value
+        scores.red += value
+      }
+    }
+    return scores
+  }
+
+  override getScores(): Scores {
+    const scores = { blue: 0, red: 0 } as Scores
+    if (this.cones.length === 0) {
+      return scores
+    }
+    const value = pointMap[this.junctionHeight]
+    for (let cone of this.cones) {
+      if (cone === 'blue') {
+        scores.blue += value
+      } else if (cone === 'red') {
+        scores.red += value
       }
     }
 
     const top = this.cones[this.cones.length - 1]
     if (top === 'blue') {
-      points.blue += 3
+      scores.blue += 3
     } else if (top === 'blue beacon') {
-      points.blue += 10
+      scores.blue += 10
     } else if (top === 'red') {
-      points.red += 3
+      scores.red += 3
     } else {
-      points.red += 10
+      scores.red += 10
     }
 
-    return points
+    return scores
   }
 }
