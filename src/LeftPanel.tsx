@@ -1,4 +1,4 @@
-import { Box, Flex, Heading, Text } from '@chakra-ui/react'
+import { Box, Button, Flex, Heading, Text } from '@chakra-ui/react'
 import React, { FC } from 'react'
 import { ScoreReport } from './types'
 
@@ -15,6 +15,11 @@ const LeftPanel: FC<Props> = ({ scores }) => {
         </Heading>
         <Text fontSize='18px'>Autonomous: {scores.blueAuton}</Text>
         <Text fontSize='18px'>Teleop: {scores.blueTeleOp}</Text>
+        <Heading mt='25px' as='h6' fontSize='28px'>
+          Penalize
+        </Heading>
+        <Button>Minor Penalty</Button>
+        <Button>Major Penalty</Button>
       </Box>
       <Box>
         <Heading as='h6' fontSize='28px'>
