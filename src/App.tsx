@@ -43,17 +43,17 @@ function App() {
         e.preventDefault()
       }
       console.log('space', period)
-      if (period === 'autonomous') {
-        console.log('state')
-        setPeriod('teleop')
-      } else {
-        console.log('test')
+      setPeriod(p => {
+        if (p === 'autonomous') {
+          return 'teleop'
+        }
         const canvas = document.getElementById('canvas') as HTMLCanvasElement | null
         if (canvas) {
           field = new PowerPlayField(canvas)
-          setPeriod('autonomous')
+          return 'autonomous'
         }
-      }
+        return 'teleop'
+      })
     },
     [period, setPeriod]
   )
