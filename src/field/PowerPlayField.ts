@@ -6,9 +6,10 @@ import Junction from './Junction'
 import LowJunction from './LowJunction'
 import HighJunction from './HighJunction'
 import GroundJunction from './GroundJunction'
-import Corner from './Corner'
+import Terminal from './Terminal'
 import { Period, Scores, TeamColor } from '../types'
 import Substation from './Substation'
+import SignalSleeve from './SignalSleeve'
 
 const getMousePos = (canvas: HTMLCanvasElement, evt: MouseEvent) => {
   var rect = canvas.getBoundingClientRect(), // abs. size of element
@@ -23,7 +24,7 @@ const getMousePos = (canvas: HTMLCanvasElement, evt: MouseEvent) => {
 
 export default class PowerPlayField {
   junctions: Junction[][] = [[], [], [], [], []]
-  corners: Corner[] = []
+  terminals: Terminal[] = []
   objects: FieldObject[] = []
 
   scores: Scores = { blue: 0, red: 0 }
@@ -80,19 +81,24 @@ export default class PowerPlayField {
     this.junctions[4].push(new LowJunction((1000 / 6) * 4, (1000 / 6) * 5, canvas))
     this.junctions[4].push(new GroundJunction((1000 / 6) * 5, (1000 / 6) * 5, canvas))
 
-    this.corners.push(new Corner(0, (1000 / 6) * 5, canvas, 'blue'))
-    this.corners.push(new Corner((1000 / 6) * 5, 0, canvas, 'blue', true))
-    this.corners.push(new Corner((1000 / 6) * 5, (1000 / 6) * 5, canvas, 'red'))
-    this.corners.push(new Corner(0, 0, canvas, 'red', true))
+    this.terminals.push(new Terminal(0, (1000 / 6) * 5, canvas, 'blue'))
+    this.terminals.push(new Terminal((1000 / 6) * 5, 0, canvas, 'blue', true))
+    this.terminals.push(new Terminal((1000 / 6) * 5, (1000 / 6) * 5, canvas, 'red'))
+    this.terminals.push(new Terminal(0, 0, canvas, 'red', true))
 
     this.objects.push(new Substation(0, 1000 / 2, canvas, 'blue'))
     this.objects.push(new Substation(1000, 1000 / 2, canvas, 'red'))
+
+    this.objects.push(new SignalSleeve(1000 / 4, 1000 / 4, canvas, 'blue'))
+    this.objects.push(new SignalSleeve(1000 / 4, (3 * 1000) / 4, canvas, 'blue'))
+    this.objects.push(new SignalSleeve((3 * 1000) / 4, 1000 / 4, canvas, 'red'))
+    this.objects.push(new SignalSleeve((3 * 1000) / 4, (3 * 1000) / 4, canvas, 'red'))
   }
 
   render(): void {
     this.objects.forEach(o => o.render())
     this.junctions.forEach(row => row.forEach(junction => junction.render()))
-    this.corners.forEach(c => c.render())
+    this.terminals.forEach(c => c.render())
   }
 
   onBeaconUpdate(color: TeamColor, isPlaced: boolean) {
@@ -112,7 +118,7 @@ export default class PowerPlayField {
         }
       }
     }
-    for (let corner of this.corners) {
+    for (let corner of this.terminals) {
       if (corner.isPointWithin(x, y)) {
         corner.handleClick(e)
         return
@@ -132,7 +138,7 @@ export default class PowerPlayField {
         junction.setHovering(junction.isPointWithin(x, y))
       }
     }
-    for (let corner of this.corners) {
+    for (let corner of this.terminals) {
       corner.setHovering(corner.isPointWithin(x, y))
     }
     for (let obj of this.objects) {
@@ -150,8 +156,8 @@ export default class PowerPlayField {
         scores.red += s.red
       }
     }
-    for (let corner of this.corners) {
-      const s = corner.getScores()
+    for (let terminal of this.terminals) {
+      const s = terminal.getScores()
       scores.blue += s.blue
       scores.red += s.red
     }
@@ -176,7 +182,7 @@ export default class PowerPlayField {
         this.autonomousDuplicatePoints.red += s.red
       }
     }
-    for (let corner of this.corners) {
+    for (let corner of this.terminals) {
       const s = corner.getScores()
       this.autonomousDuplicatePoints.blue += s.blue
       this.autonomousDuplicatePoints.red += s.red

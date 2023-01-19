@@ -2,12 +2,13 @@ import drawRotatedRect from '../drawRotatedRect'
 import { Cone, Scores, TeamColor } from '../types'
 import FieldObject from './FieldObject'
 
-export default class Corner extends FieldObject {
+export default class Terminal extends FieldObject {
   cones: Cone[] = []
   lastClicked: number = 0
   lastDeleted: number = 0
   isTop: boolean
   color: TeamColor
+  parks: number = 0
 
   constructor(x: number, y: number, canvas: HTMLCanvasElement, color: TeamColor, isTop: boolean = false) {
     super(x, y, 1000 / 6, 1000 / 6, canvas)
@@ -51,12 +52,11 @@ export default class Corner extends FieldObject {
     }
     drawRotatedRect(this.ctx, this.x + 125, yPos, 15, 400, this.color === 'blue' ? -45 : 45)
 
-    const ownership = this.cones.length !== 0 ? this.cones[this.cones.length - 1] : 'none'
-    if (ownership !== 'none') {
-      if (ownership === 'blue') {
+    if (this.cones.length) {
+      if (this.color === 'blue') {
         this.ctx.fillStyle = this.hovering ? '#4e51f5' : '#0a0ef2'
         this.ctx.strokeStyle = '#0a0a75'
-      } else if (ownership === 'red') {
+      } else if (this.color === 'red') {
         this.ctx.fillStyle = this.hovering ? '#f54340' : '#fe0f0a'
         this.ctx.strokeStyle = '#500910'
       }
@@ -75,6 +75,24 @@ export default class Corner extends FieldObject {
       this.ctx.fill()
       this.ctx.stroke()
     }
+
+    // Parks
+    if (this.color === 'blue') {
+      this.ctx.fillStyle = this.hovering ? '#4e51f5' : '#0a0ef2'
+      this.ctx.strokeStyle = '#0a0a75'
+    } else if (this.color === 'red') {
+      this.ctx.fillStyle = this.hovering ? '#f54340' : '#fe0f0a'
+      this.ctx.strokeStyle = '#500910'
+    }
+    for (let i = 0; i < this.parks; i++) {
+      const offset = 15 + 20 * i
+      this.ctx.beginPath()
+      const cy = this.isTop ? 15 : 985
+      const cx = this.isTop !== (this.color === 'blue') ? offset : 1000 - offset
+      this.ctx.arc(cx, cy, 7, 0, 2 * Math.PI, false)
+      this.ctx.fill()
+      this.ctx.stroke()
+    }
   }
 
   isPointWithin(x: number, y: number): boolean {
@@ -89,14 +107,27 @@ export default class Corner extends FieldObject {
 
   handleClick(e: MouseEvent): void {
     if (e.ctrlKey) {
-      this.cones.pop()
-      this.lastDeleted = Date.now()
+      if (e.altKey) {
+        this.parks--
+      } else {
+        this.cones.pop()
+        this.lastDeleted = Date.now()
+      }
       return
     }
-    if (e.button === 0 && this.color === 'blue') {
+
+    // Parks
+    if (e.altKey) {
+      if (this.parks < 4) {
+        this.parks++
+      }
+      return
+    }
+
+    if (this.color === 'blue') {
       this.cones.push('blue')
       this.lastClicked = Date.now()
-    } else if (e.button === 2 && this.color === 'red') {
+    } else if (this.color === 'red') {
       this.cones.push('red')
       this.lastClicked = Date.now()
     }
@@ -104,6 +135,7 @@ export default class Corner extends FieldObject {
 
   override getScores(): Scores {
     const points = { blue: 0, red: 0 } as Scores
+    points[this.color] += this.parks * 2
     if (this.cones.length === 0) {
       return points
     }
