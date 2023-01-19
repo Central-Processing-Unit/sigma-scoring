@@ -2,6 +2,7 @@ import drawRotatedRect from '../drawRotatedRect'
 import { Cone, Scores, TeamColor } from '../types'
 import FieldObject from './FieldObject'
 
+// todo: could limit to two parts between the terminals, but not really necessary
 export default class Terminal extends FieldObject {
   cones: Cone[] = []
   lastClicked: number = 0
@@ -9,6 +10,7 @@ export default class Terminal extends FieldObject {
   isTop: boolean
   color: TeamColor
   parks: number = 0
+  isAuton = true
 
   constructor(x: number, y: number, canvas: HTMLCanvasElement, color: TeamColor, isTop: boolean = false) {
     super(x, y, 1000 / 6, 1000 / 6, canvas)
@@ -69,8 +71,8 @@ export default class Terminal extends FieldObject {
         this.ctx.strokeStyle = '#f57269'
       }
       this.ctx.beginPath()
-      const cy = this.isTop ? 1000 / 24 : (3 * 1000) / 24
-      const cx = this.isTop !== (this.color === 'blue') ? 1000 / 24 : (3 * 1000) / 24
+      const cy = this.isTop ? 1000 / 24 + 5 : (3 * 1000) / 24 - 5
+      const cx = this.isTop !== (this.color === 'blue') ? 1000 / 24 + 5 : (3 * 1000) / 24 - 5
       this.ctx.arc(this.x + cx, this.y + cy, 15, 0, 2 * Math.PI, false)
       this.ctx.fill()
       this.ctx.stroke()
@@ -85,13 +87,11 @@ export default class Terminal extends FieldObject {
       this.ctx.strokeStyle = '#500910'
     }
     for (let i = 0; i < this.parks; i++) {
-      const offset = 15 + 20 * i
-      this.ctx.beginPath()
-      const cy = this.isTop ? 15 : 985
-      const cx = this.isTop !== (this.color === 'blue') ? offset : 1000 - offset
-      this.ctx.arc(cx, cy, 7, 0, 2 * Math.PI, false)
-      this.ctx.fill()
-      this.ctx.stroke()
+      const offset = 10 + 20 * i
+      const cy = this.isTop ? 8 : 980
+      const cx = this.isTop !== (this.color === 'blue') ? offset : 988 - offset
+      this.ctx.fillRect(cx, cy, 12, 12)
+      this.ctx.strokeRect(cx, cy, 12, 12)
     }
   }
 
@@ -108,7 +108,9 @@ export default class Terminal extends FieldObject {
   handleClick(e: MouseEvent): void {
     if (e.ctrlKey) {
       if (e.altKey) {
-        this.parks--
+        if (this.parks > 0) {
+          this.parks--
+        }
       } else {
         this.cones.pop()
         this.lastDeleted = Date.now()
@@ -118,19 +120,14 @@ export default class Terminal extends FieldObject {
 
     // Parks
     if (e.altKey) {
-      if (this.parks < 4) {
+      if (this.parks < 2 && (!this.isAuton || !this.isTop)) {
         this.parks++
       }
       return
     }
 
-    if (this.color === 'blue') {
-      this.cones.push('blue')
-      this.lastClicked = Date.now()
-    } else if (this.color === 'red') {
-      this.cones.push('red')
-      this.lastClicked = Date.now()
-    }
+    this.cones.push(this.color)
+    this.lastClicked = Date.now()
   }
 
   override getScores(): Scores {
@@ -147,5 +144,10 @@ export default class Terminal extends FieldObject {
       }
     }
     return points
+  }
+
+  override endAutonomous(): void {
+    this.parks = 0
+    this.isAuton = false
   }
 }

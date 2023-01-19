@@ -1,12 +1,13 @@
 import drawRotatedRect from '../drawRotatedRect'
-import { Cone, Scores, TeamColor } from '../types'
+import { Scores, TeamColor } from '../types'
 import FieldObject from './FieldObject'
 
 export default class Substation extends FieldObject {
-  cones: Cone[] = []
   color: TeamColor
   lastClicked: number = 0
   lastDeleted: number = 0
+  parks: number = 0
+  isAuton = true
 
   constructor(x: number, y: number, canvas: HTMLCanvasElement, color: TeamColor) {
     super(x, y, 1000 / 12, 1000 / 6, canvas)
@@ -45,38 +46,23 @@ export default class Substation extends FieldObject {
       drawRotatedRect(this.ctx, 954, 402, 10, 120, 45, false)
     }
 
+    // Parks
+    for (let i = 0; i < this.parks; i++) {
+      const py = 470 + 45 * i
+      this.ctx.fillRect(this.color === 'blue' ? 10 : 975, py, 15, 15)
+      this.ctx.strokeRect(this.color === 'blue' ? 10 : 975, py, 15, 15)
+    }
+
     // Replace line
     this.ctx.fillStyle = '#3e3e3e'
     this.ctx.strokeStyle = '#73722c'
     this.ctx.fillRect(this.x - (this.color === 'red' ? this.width + 25 : 0), this.y - 3, this.width + 25, 6)
-
-    // const ownership = this.cones.length !== 0 ? this.cones[this.cones.length - 1] : 'none'
-    // if (ownership !== 'none') {
-    //   if (ownership === 'blue') {
-    //     this.ctx.fillStyle = this.hovering ? '#4e51f5' : '#0a0ef2'
-    //     this.ctx.strokeStyle = '#0a0a75'
-    //   } else if (ownership === 'red') {
-    //     this.ctx.fillStyle = this.hovering ? '#f54340' : '#fe0f0a'
-    //     this.ctx.strokeStyle = '#500910'
-    //   }
-    //   const recentlyClicked = Date.now() - this.lastClicked < 500
-    //   if (recentlyClicked) {
-    //     this.ctx.strokeStyle = '#d6d6d0'
-    //   }
-    //   const recentlyDeleted = Date.now() - this.lastDeleted < 500
-    //   if (recentlyDeleted) {
-    //     this.ctx.strokeStyle = '#f57269'
-    //   }
-    //   this.ctx.beginPath()
-    //   const cy = this.isTop ? 1000 / 24 : (3 * 1000) / 24
-    //   const cx = this.isTop !== (this.color === 'blue') ? 1000 / 24 : (3 * 1000) / 24
-    //   this.ctx.arc(this.x + cx, this.y + cy, 15, 0, 2 * Math.PI, false)
-    //   this.ctx.fill()
-    //   this.ctx.stroke()
-    // }
   }
 
   isPointWithin(x: number, y: number): boolean {
+    if (!this.isAuton) {
+      return false
+    }
     const xDist = Math.abs(x - this.x)
     const yDist = Math.abs(y - this.y)
     // let xCornerDist = this.color === 'blue' ? x - this.x : this.x + this.width - x
@@ -86,32 +72,26 @@ export default class Substation extends FieldObject {
   }
 
   handleClick(e: MouseEvent): void {
-    if (e.ctrlKey) {
-      this.cones.pop()
-      this.lastDeleted = Date.now()
+    if (!this.isAuton) {
       return
     }
-    if (e.button === 0 && this.color === 'blue') {
-      this.cones.push('blue')
-      this.lastClicked = Date.now()
-    } else if (e.button === 2 && this.color === 'red') {
-      this.cones.push('red')
-      this.lastClicked = Date.now()
+    if (e.ctrlKey) {
+      if (this.parks > 0) {
+        this.parks--
+      }
+    } else if (this.parks < 2) {
+      this.parks++
     }
   }
 
   override getScores(): Scores {
     const points = { blue: 0, red: 0 } as Scores
-    if (this.cones.length === 0) {
-      return points
-    }
-    for (let cone of this.cones) {
-      if (cone === 'blue') {
-        points.blue++
-      } else if (cone === 'red') {
-        points.red++
-      }
-    }
+    points[this.color] += this.parks * 2
     return points
+  }
+
+  override endAutonomous(): void {
+    this.parks = 0
+    this.isAuton = false
   }
 }

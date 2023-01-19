@@ -31,4 +31,6 @@ export default abstract class FieldObject {
   getScores(): Scores {
     return { blue: 0, red: 0 }
   }
+
+  endAutonomous(): void {}
 }

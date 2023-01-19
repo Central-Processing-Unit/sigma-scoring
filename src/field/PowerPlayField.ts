@@ -148,7 +148,7 @@ export default class PowerPlayField {
 
   // todo: could optimize by only calculating this on change
   updateScores(): void {
-    const scores = { blue: this.autonomousDuplicatePoints.blue, red: this.autonomousDuplicatePoints.red } as Scores
+    const scores = { blue: this.autonomousScores.blue, red: this.autonomousScores.red } as Scores
     for (let row of this.junctions) {
       for (let junction of row) {
         const s = junction.getScores()
@@ -178,16 +178,24 @@ export default class PowerPlayField {
       for (let junction of row) {
         const s = junction.getAutonomousScores()
         console.log(s.blue)
-        this.autonomousDuplicatePoints.blue += s.blue
-        this.autonomousDuplicatePoints.red += s.red
+        this.autonomousScores.blue += s.blue
+        this.autonomousScores.red += s.red
       }
     }
     for (let corner of this.terminals) {
       const s = corner.getScores()
-      this.autonomousDuplicatePoints.blue += s.blue
-      this.autonomousDuplicatePoints.red += s.red
+      this.autonomousScores.blue += s.blue
+      this.autonomousScores.red += s.red
+      corner.endAutonomous()
     }
-    this.autonomousScores = this.autonomousDuplicatePoints
+    for (let object of this.objects) {
+      const s = object.getScores()
+      this.autonomousScores.blue += s.blue
+      this.autonomousScores.red += s.red
+      object.endAutonomous()
+    }
+    this.autonomousScores.blue += this.autonomousDuplicatePoints.blue
+    this.autonomousScores.red += this.autonomousDuplicatePoints.red
     this.updateScores()
     this.period = 'teleop'
   }
