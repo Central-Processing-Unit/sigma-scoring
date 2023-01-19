@@ -13,6 +13,7 @@ export default class Junction extends FieldObject {
   lastClicked: number = 0
   lastDeleted: number = 0
   junctionHeight: JunctionHeight
+  isSearched = false
 
   constructor(x: number, y: number, canvas: HTMLCanvasElement, junctionHeight: JunctionHeight, radius: number = 15) {
     super(x, y, radius, radius, canvas)
@@ -149,5 +150,13 @@ export default class Junction extends FieldObject {
     }
 
     return scores
+  }
+
+  getOwnership(): TeamColor | null {
+    if (!this.cones.length) {
+      return null
+    }
+    const c = this.cones[this.cones.length - 1]
+    return c.startsWith('blue') ? 'blue' : 'red'
   }
 }

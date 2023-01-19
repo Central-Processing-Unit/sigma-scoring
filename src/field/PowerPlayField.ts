@@ -81,10 +81,10 @@ export default class PowerPlayField {
     this.junctions[4].push(new LowJunction((1000 / 6) * 4, (1000 / 6) * 5, canvas))
     this.junctions[4].push(new GroundJunction((1000 / 6) * 5, (1000 / 6) * 5, canvas))
 
-    this.terminals.push(new Terminal(0, (1000 / 6) * 5, canvas, 'blue'))
-    this.terminals.push(new Terminal((1000 / 6) * 5, 0, canvas, 'blue', true))
-    this.terminals.push(new Terminal((1000 / 6) * 5, (1000 / 6) * 5, canvas, 'red'))
     this.terminals.push(new Terminal(0, 0, canvas, 'red', true))
+    this.terminals.push(new Terminal(0, (1000 / 6) * 5, canvas, 'blue'))
+    this.terminals.push(new Terminal((1000 / 6) * 5, (1000 / 6) * 5, canvas, 'red'))
+    this.terminals.push(new Terminal((1000 / 6) * 5, 0, canvas, 'blue', true))
 
     this.objects.push(new Substation(0, 1000 / 2, canvas, 'blue'))
     this.objects.push(new Substation(1000, 1000 / 2, canvas, 'red'))
@@ -166,6 +166,26 @@ export default class PowerPlayField {
       scores.blue += s.blue
       scores.red += s.red
     }
+    if (
+      this.dfs('blue', 4, 0) &&
+      this.terminals[1].getOwnership() === 'blue' &&
+      this.terminals[3].getOwnership() === 'blue'
+    ) {
+      scores.blue += 20
+    }
+    for (let row of this.junctions) {
+      for (let junction of row) {
+        junction.isSearched = false
+      }
+    }
+    if (this.dfs('red', 0, 0) && this.terminals[0].getOwnership() === 'red' && this.terminals[2].getOwnership() === 'red') {
+      scores.red += 20
+    }
+    for (let row of this.junctions) {
+      for (let junction of row) {
+        junction.isSearched = false
+      }
+    }
     this.scores = scores
   }
 
@@ -198,5 +218,28 @@ export default class PowerPlayField {
     this.autonomousScores.red += this.autonomousDuplicatePoints.red
     this.updateScores()
     this.period = 'teleop'
+  }
+
+  dfs(color: TeamColor, row: number, column: number): boolean {
+    if (row > 4 || row < 0 || column > 4 || column < 0) {
+      return false
+    }
+    if (this.junctions[row][column].getOwnership() !== color || this.junctions[row][column].isSearched) {
+      return false
+    }
+    this.junctions[row][column].isSearched = true
+    if ((color === 'blue' && row === 0 && column === 4) || (color === 'red' && row === 4 && column === 4)) {
+      return true
+    }
+    return (
+      this.dfs(color, row - 1, column) ||
+      this.dfs(color, row + 1, column) ||
+      this.dfs(color, row, column - 1) ||
+      this.dfs(color, row, column + 1) ||
+      this.dfs(color, row - 1, column - 1) ||
+      this.dfs(color, row - 1, column + 1) ||
+      this.dfs(color, row + 1, column - 1) ||
+      this.dfs(color, row + 1, column + 1)
+    )
   }
 }

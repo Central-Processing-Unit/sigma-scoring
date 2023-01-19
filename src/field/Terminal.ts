@@ -150,4 +150,12 @@ export default class Terminal extends FieldObject {
     this.parks = 0
     this.isAuton = false
   }
+
+  getOwnership(): TeamColor | null {
+    if (!this.cones.length) {
+      return null
+    }
+    const c = this.cones[this.cones.length - 1]
+    return c.startsWith('blue') ? 'blue' : 'red'
+  }
 }
