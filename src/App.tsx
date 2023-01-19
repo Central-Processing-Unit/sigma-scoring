@@ -7,6 +7,8 @@ import { GlobalHotKeys } from 'react-hotkeys'
 import PowerPlayField from './field/PowerPlayField'
 import { Period, Scores } from './types'
 import capitalize from './capitalize'
+import LeftPanel from './LeftPanel'
+import RightPanel from './RightPanel'
 
 let field: PowerPlayField | null = null
 
@@ -66,11 +68,17 @@ function App() {
     CONTINUE: ['space']
   }
 
+  // todo: show cones visually on hover on a side panel
   console.log(period)
   return (
     <ChakraProvider>
       <GlobalHotKeys keyMap={keyMap} handlers={handlers}>
-        <Flex justifyContent='center' alignItems='center' h='100vh' fontFamily='mplus'>
+        <Flex px='7vw' justifyContent='space-between' alignItems='center' h='100vh' fontFamily='mplus'>
+          <Box w='15vw' h={{ base: '90vw', lg: '80vh' }} border='8px solid #0a0ef2' outline='2px solid black'>
+            <Box w='100%' h='100%' outline='2px solid black'>
+              <LeftPanel blueScore={scores.blue} />
+            </Box>
+          </Box>
           <Box>
             <Flex justifyContent='center' mb='10px'>
               <Heading fontFamily='mplus'>Sigma Scoring</Heading>
@@ -86,6 +94,11 @@ function App() {
                 <Text textAlign='center'>Press space {period === 'autonomous' ? 'for Teleop' : 'to reset'}</Text>
               </Box>
             </Flex>
+          </Box>
+          <Box w='15vw' h={{ base: '90vw', lg: '80vh' }} border='8px solid #fe0f0a' outline='2px solid black'>
+            <Box w='100%' h='100%' outline='2px solid black'>
+              <RightPanel redScore={scores.red} />
+            </Box>
           </Box>
         </Flex>
       </GlobalHotKeys>
