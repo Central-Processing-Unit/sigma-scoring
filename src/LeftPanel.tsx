@@ -1,12 +1,15 @@
-import { Box, Button, Flex, Heading, Text } from '@chakra-ui/react'
+import { Box, Button, Flex, Heading, HStack, Input, Text } from '@chakra-ui/react'
 import React, { FC } from 'react'
-import { ScoreReport } from './types'
+import { Penalties, ScoreReport } from './types'
 
 interface Props {
   scores: ScoreReport
+  penalties: Penalties
+  onMinorPenaltyChange: (minors: number) => void
+  onMajorPenaltyChange: (majors: number) => void
 }
 
-const LeftPanel: FC<Props> = ({ scores }) => {
+const LeftPanel: FC<Props> = ({ scores, penalties, onMinorPenaltyChange, onMajorPenaltyChange }) => {
   return (
     <Flex flexDir='column' justifyContent='space-between' p='10px' h='100%'>
       <Box>
@@ -18,8 +21,15 @@ const LeftPanel: FC<Props> = ({ scores }) => {
         <Heading mt='25px' as='h6' fontSize='28px'>
           Penalize
         </Heading>
-        <Button>Minor Penalty</Button>
-        <Button>Major Penalty</Button>
+        <HStack maxW='320px'>
+          <Button onClick={() => onMinorPenaltyChange(penalties.minor.againstBlue + 1)}>+</Button>
+          <Input
+            type='number'
+            value={penalties.minor.againstBlue}
+            onChange={e => onMinorPenaltyChange(Number(e.target.value))}
+          />
+          <Button onClick={() => onMinorPenaltyChange(penalties.minor.againstBlue - 1)}>-</Button>
+        </HStack>
       </Box>
       <Box>
         <Heading as='h6' fontSize='28px'>

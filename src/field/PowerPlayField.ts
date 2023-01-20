@@ -7,7 +7,7 @@ import LowJunction from './LowJunction'
 import HighJunction from './HighJunction'
 import GroundJunction from './GroundJunction'
 import Terminal from './Terminal'
-import { Period, Scores, TeamColor } from '../types'
+import { Penalties, Period, Scores, TeamColor } from '../types'
 import Substation from './Substation'
 import SignalSleeve from './SignalSleeve'
 
@@ -32,6 +32,7 @@ export default class PowerPlayField {
   isRedBeaconPlaced = false
   autonomousScores: Scores = { blue: 0, red: 0 }
   autonomousDuplicatePoints: Scores = { blue: 0, red: 0 } // for cones that are scored in autonomous. they need to be double-counted
+  penalties: Penalties = { minor: { againstBlue: 0, againstRed: 0 }, major: { againstBlue: 0, againstRed: 0 } }
 
   period: Period = 'autonomous'
 

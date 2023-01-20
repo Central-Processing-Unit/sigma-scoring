@@ -19,3 +19,14 @@ export type Cone = 'blue' | 'red' | 'blue beacon' | 'red beacon'
 export type TeamColor = 'blue' | 'red'
 
 export type Period = 'autonomous' | 'teleop'
+
+export interface Penalties {
+  minor: {
+    againstBlue: number
+    againstRed: number
+  }
+  major: {
+    againstBlue: number
+    againstRed: number
+  }
+}

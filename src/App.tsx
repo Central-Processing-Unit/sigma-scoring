@@ -5,7 +5,7 @@ import Canvas from './Canvas'
 import { useState } from 'react'
 import { GlobalHotKeys } from 'react-hotkeys'
 import PowerPlayField from './field/PowerPlayField'
-import { Period, ScoreReport, Scores } from './types'
+import { Penalties, Period, ScoreReport, Scores } from './types'
 import capitalize from './capitalize'
 import LeftPanel from './LeftPanel'
 import RightPanel from './RightPanel'
@@ -22,6 +22,10 @@ function App() {
     redTeleOp: 0
   })
   const [period, setPeriod] = useState<Period>('autonomous')
+  const [penalties, setPenalties] = useState<Penalties>({
+    minor: { againstBlue: 0, againstRed: 0 },
+    major: { againstBlue: 0, againstRed: 0 }
+  })
 
   const draw = (ctx: CanvasRenderingContext2D, frame: number) => {
     const canvas = document.getElementById('canvas') as HTMLCanvasElement | null
@@ -113,7 +117,13 @@ function App() {
         <Flex px='7vw' justifyContent='space-between' alignItems='center' h='100vh' fontFamily='mplus'>
           <Box w='15vw' h={{ base: '90vw', lg: '80vh' }} border='8px solid #0a0ef2' outline='2px solid black'>
             <Box w='100%' h='100%' outline='2px solid black'>
-              <LeftPanel scores={scores} />
+              {/* todo: limit to at least 0 penalties */}
+              <LeftPanel
+                scores={scores}
+                penalties={penalties}
+                onMinorPenaltyChange={p => setPenalties(ps => ({ ...ps, minor: { ...ps.minor, againstBlue: p } }))}
+                onMajorPenaltyChange={p => setPenalties(ps => ({ ...ps, major: { ...ps.major, againstBlue: p } }))}
+              />
             </Box>
           </Box>
           <Box>
