@@ -102,6 +102,13 @@ function App() {
     [period, setPeriod]
   )
 
+  useEffect(() => {
+    if (field) {
+      field.penalties = penalties
+      setTimeout(copyScores, 0)
+    }
+  }, [penalties])
+
   const handlers = {
     CONTINUE: handleContinue // todo: this callback isn't getting the current value of period :(
   }
@@ -117,12 +124,15 @@ function App() {
         <Flex px='7vw' justifyContent='space-between' alignItems='center' h='100vh' fontFamily='mplus'>
           <Box w='15vw' h={{ base: '90vw', lg: '80vh' }} border='8px solid #0a0ef2' outline='2px solid black'>
             <Box w='100%' h='100%' outline='2px solid black'>
-              {/* todo: limit to at least 0 penalties */}
               <LeftPanel
                 scores={scores}
                 penalties={penalties}
-                onMinorPenaltyChange={p => setPenalties(ps => ({ ...ps, minor: { ...ps.minor, againstBlue: p } }))}
-                onMajorPenaltyChange={p => setPenalties(ps => ({ ...ps, major: { ...ps.major, againstBlue: p } }))}
+                onMinorPenaltyChange={p =>
+                  setPenalties(ps => ({ ...ps, minor: { ...ps.minor, againstBlue: p >= 0 ? p : 0 } }))
+                }
+                onMajorPenaltyChange={p =>
+                  setPenalties(ps => ({ ...ps, major: { ...ps.major, againstBlue: p >= 0 ? p : 0 } }))
+                }
               />
             </Box>
           </Box>
@@ -144,7 +154,16 @@ function App() {
           </Box>
           <Box w='15vw' h={{ base: '90vw', lg: '80vh' }} border='8px solid #fe0f0a' outline='2px solid black'>
             <Box w='100%' h='100%' outline='2px solid black'>
-              <RightPanel scores={scores} />
+              <RightPanel
+                scores={scores}
+                penalties={penalties}
+                onMinorPenaltyChange={p =>
+                  setPenalties(ps => ({ ...ps, minor: { ...ps.minor, againstRed: p >= 0 ? p : 0 } }))
+                }
+                onMajorPenaltyChange={p =>
+                  setPenalties(ps => ({ ...ps, major: { ...ps.major, againstRed: p >= 0 ? p : 0 } }))
+                }
+              />
             </Box>
           </Box>
         </Flex>

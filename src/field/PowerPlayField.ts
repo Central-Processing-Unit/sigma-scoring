@@ -147,6 +147,13 @@ export default class PowerPlayField {
     }
   }
 
+  getPenaltyScores(): Scores {
+    return {
+      blue: this.penalties.minor.againstRed * 10 + this.penalties.major.againstRed * 30,
+      red: this.penalties.minor.againstBlue * 10 + this.penalties.major.againstBlue * 30
+    }
+  }
+
   // todo: could optimize by only calculating this on change
   updateScores(): void {
     const scores = { blue: this.autonomousScores.blue, red: this.autonomousScores.red } as Scores
@@ -187,6 +194,11 @@ export default class PowerPlayField {
         junction.isSearched = false
       }
     }
+
+    const penaltyScores = this.getPenaltyScores()
+    scores.blue += penaltyScores.blue
+    scores.red += penaltyScores.red
+
     this.scores = scores
   }
 
