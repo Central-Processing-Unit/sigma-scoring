@@ -10,6 +10,8 @@ export interface ScoreReport {
   redAuton: number
   blueTeleOp: number
   redTeleOp: number
+  bluePenaltyFor: number
+  redPenaltyFor: number
 }
 
 export type JunctionHeight = 'ground' | 'low' | 'medium' | 'high'

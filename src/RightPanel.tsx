@@ -17,6 +17,7 @@ const RightPanel: FC<Props> = ({ scores, penalties, onMinorPenaltyChange, onMajo
       </Heading>
       <Text fontSize='18px'>Autonomous: {scores.redAuton}</Text>
       <Text fontSize='18px'>Teleop: {scores.redTeleOp}</Text>
+      <Text fontSize='18px'>Penalty: {scores.redPenaltyFor}</Text>
       <Heading mt='25px' as='h6' fontSize='28px'>
         Penalize
       </Heading>

@@ -17,6 +17,7 @@ const LeftPanel: FC<Props> = ({ scores, penalties, onMinorPenaltyChange, onMajor
       </Heading>
       <Text fontSize='18px'>Autonomous: {scores.blueAuton}</Text>
       <Text fontSize='18px'>Teleop: {scores.blueTeleOp}</Text>
+      <Text fontSize='18px'>Penalty: {scores.bluePenaltyFor}</Text>
       <Heading mt='25px' as='h6' fontSize='28px'>
         Penalize
       </Heading>
@@ -56,7 +57,7 @@ const LeftPanel: FC<Props> = ({ scores, penalties, onMinorPenaltyChange, onMajor
           </Button>
         </HStack>
       </Flex>
-      <Heading as='h6' fontSize='28px' mt='10px'>
+      <Heading as='h6' fontSize='28px' mt='25px'>
         Usage
       </Heading>
       <Text>

@@ -19,7 +19,9 @@ function App() {
     blueAuton: 0,
     redAuton: 0,
     blueTeleOp: 0,
-    redTeleOp: 0
+    redTeleOp: 0,
+    bluePenaltyFor: 0,
+    redPenaltyFor: 0
   })
   const [period, setPeriod] = useState<Period>('autonomous')
   const [penalties, setPenalties] = useState<Penalties>({
@@ -56,17 +58,20 @@ function App() {
       }
       const { blue, red } = field.scores
       let { blue: blueAuton, red: redAuton } = field.autonomousScores
+      const penaltyScores = field.getPenaltyScores()
       if (field.period === 'autonomous') {
-        blueAuton = blue
-        redAuton = red
+        blueAuton = blue - penaltyScores.blue
+        redAuton = red - penaltyScores.red
       }
       return {
         blue,
         red,
         blueAuton,
         redAuton,
-        blueTeleOp: field.period === 'autonomous' ? 0 : blue - blueAuton,
-        redTeleOp: field.period === 'autonomous' ? 0 : red - redAuton
+        blueTeleOp: field.period === 'autonomous' ? 0 : blue - blueAuton - penaltyScores.blue,
+        redTeleOp: field.period === 'autonomous' ? 0 : red - redAuton - penaltyScores.red,
+        bluePenaltyFor: penaltyScores.blue,
+        redPenaltyFor: penaltyScores.red
       }
     })
   }
@@ -90,8 +95,11 @@ function App() {
           blueAuton: 0,
           redAuton: 0,
           blueTeleOp: 0,
-          redTeleOp: 0
+          redTeleOp: 0,
+          bluePenaltyFor: 0,
+          redPenaltyFor: 0
         })
+        setPenalties({ minor: { againstBlue: 0, againstRed: 0 }, major: { againstBlue: 0, againstRed: 0 } })
         if (canvas) {
           field = new PowerPlayField(canvas)
           return 'autonomous'

@@ -7,6 +7,7 @@ class SignalSleeve extends FieldObject {
   color: TeamColor
   isCustom: boolean
   isParked: boolean = false
+  isAutonomous = true
 
   constructor(x: number, y: number, canvas: HTMLCanvasElement, color: TeamColor, isCustom: boolean = true) {
     super(x, y, radius, radius, canvas)
@@ -52,7 +53,7 @@ class SignalSleeve extends FieldObject {
   }
 
   override getScores(): Scores {
-    if (!this.isParked) {
+    if (!this.isParked || !this.isAutonomous) {
       return { blue: 0, red: 0 }
     }
     const value = this.isCustom ? 20 : 10
@@ -60,6 +61,10 @@ class SignalSleeve extends FieldObject {
       blue: this.color === 'blue' ? value : 0,
       red: this.color === 'red' ? value : 0
     }
+  }
+
+  override endAutonomous(): void {
+    this.isAutonomous = false
   }
 }
 
