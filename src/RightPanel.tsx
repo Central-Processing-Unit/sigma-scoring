@@ -1,15 +1,16 @@
-import { Box, Button, Flex, Heading, HStack, Input, Text } from '@chakra-ui/react'
+import { Box, Button, Fade, Flex, Heading, HStack, Input, Text } from '@chakra-ui/react'
 import React, { FC } from 'react'
-import { Penalties, ScoreReport } from './types'
+import { Cone, Penalties, ScoreReport } from './types'
 
 interface Props {
   scores: ScoreReport
   penalties: Penalties
   onMinorPenaltyChange: (minors: number) => void
   onMajorPenaltyChange: (majors: number) => void
+  hoveredConeStack: Cone[]
 }
 
-const RightPanel: FC<Props> = ({ scores, penalties, onMinorPenaltyChange, onMajorPenaltyChange }) => {
+const RightPanel: FC<Props> = ({ scores, penalties, onMinorPenaltyChange, onMajorPenaltyChange, hoveredConeStack }) => {
   return (
     <Box p='10px'>
       <Heading as='h6' fontSize='28px'>
@@ -56,6 +57,22 @@ const RightPanel: FC<Props> = ({ scores, penalties, onMinorPenaltyChange, onMajo
             -
           </Button>
         </HStack>
+      </Flex>
+      <Heading mt='25px' as='h6' fontSize='28px'>
+        Cone Stack
+      </Heading>
+      <Text mt='10px'>Hover a junction or terminal with cones to see the stack below.</Text>
+      <Flex flexDir='column-reverse' alignItems='center' mt='10px'>
+        {hoveredConeStack.map((color, index) => (
+          <Box
+            key={color + index}
+            w='50px'
+            h='25px'
+            bgColor={color.startsWith('blue') ? '#0a0ef2' : '#fe0f0a'}
+            border='2px solid black'
+            borderBottom={index === 0 ? '2px solid black' : 'none'}
+          />
+        ))}
       </Flex>
     </Box>
   )

@@ -7,7 +7,7 @@ import LowJunction from './LowJunction'
 import HighJunction from './HighJunction'
 import GroundJunction from './GroundJunction'
 import Terminal from './Terminal'
-import { Penalties, Period, Scores, TeamColor } from '../types'
+import { Cone, Penalties, Period, Scores, TeamColor } from '../types'
 import Substation from './Substation'
 import SignalSleeve from './SignalSleeve'
 
@@ -35,6 +35,8 @@ export default class PowerPlayField {
   penalties: Penalties = { minor: { againstBlue: 0, againstRed: 0 }, major: { againstBlue: 0, againstRed: 0 } }
 
   period: Period = 'autonomous'
+
+  hoveredConeStack: Cone[] = []
 
   canvas: HTMLCanvasElement
 
@@ -119,9 +121,9 @@ export default class PowerPlayField {
         }
       }
     }
-    for (let corner of this.terminals) {
-      if (corner.isPointWithin(x, y)) {
-        corner.handleClick(e)
+    for (let terminal of this.terminals) {
+      if (terminal.isPointWithin(x, y)) {
+        terminal.handleClick(e)
         return
       }
     }
@@ -134,16 +136,30 @@ export default class PowerPlayField {
   }
 
   handleMouseMove(x: number, y: number, e: MouseEvent): void {
+    let isHoveringConeStack = false
     for (let row of this.junctions) {
       for (let junction of row) {
-        junction.setHovering(junction.isPointWithin(x, y))
+        const isWithin = junction.isPointWithin(x, y)
+        junction.setHovering(isWithin)
+        if (isWithin && !isHoveringConeStack) {
+          isHoveringConeStack = true
+          this.hoveredConeStack = junction.cones
+        }
       }
     }
-    for (let corner of this.terminals) {
-      corner.setHovering(corner.isPointWithin(x, y))
+    for (let terminal of this.terminals) {
+      const isWithin = terminal.isPointWithin(x, y)
+      terminal.setHovering(isWithin)
+      if (isWithin && !isHoveringConeStack) {
+        isHoveringConeStack = true
+        this.hoveredConeStack = terminal.cones
+      }
     }
     for (let obj of this.objects) {
       obj.setHovering(obj.isPointWithin(x, y))
+    }
+    if (!isHoveringConeStack) {
+      this.hoveredConeStack = []
     }
   }
 
@@ -215,11 +231,11 @@ export default class PowerPlayField {
         this.autonomousScores.red += s.red
       }
     }
-    for (let corner of this.terminals) {
-      const s = corner.getScores()
+    for (let terminal of this.terminals) {
+      const s = terminal.getScores()
       this.autonomousScores.blue += s.blue
       this.autonomousScores.red += s.red
-      corner.endAutonomous()
+      terminal.endAutonomous()
     }
     for (let object of this.objects) {
       const s = object.getScores()

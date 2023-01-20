@@ -1,12 +1,12 @@
-import React, { FC, MouseEventHandler, RefObject, useEffect, useRef } from 'react'
-import PropTypes from 'prop-types'
+import React, { FC, MouseEventHandler, useEffect, useRef } from 'react'
 
 interface Props {
   draw: (ctx: CanvasRenderingContext2D, frame: number) => void
   onClick?: MouseEventHandler<HTMLCanvasElement>
+  onMouseMove?: MouseEventHandler<HTMLCanvasElement>
 }
 
-const Canvas: FC<Props> = ({ draw, onClick, ...props }) => {
+const Canvas: FC<Props> = ({ draw, onClick, onMouseMove }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   useEffect(() => {
     const canvas = canvasRef.current
@@ -37,10 +37,10 @@ const Canvas: FC<Props> = ({ draw, onClick, ...props }) => {
       style={{ width: '100%', height: '100%' }}
       onClick={onClick}
       onContextMenu={onClick}
+      onMouseMove={onMouseMove}
       width={1000}
       height={1000}
       ref={canvasRef}
-      {...props}
     />
   )
 }

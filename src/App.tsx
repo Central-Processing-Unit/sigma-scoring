@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useRef } from 'react'
+import React, { MouseEventHandler, useCallback, useEffect, useRef } from 'react'
 import './App.css'
 import { Box, ChakraProvider, Flex, Heading, Text } from '@chakra-ui/react'
 import Canvas from './Canvas'
 import { useState } from 'react'
 import { GlobalHotKeys } from 'react-hotkeys'
 import PowerPlayField from './field/PowerPlayField'
-import { Penalties, Period, ScoreReport, Scores } from './types'
+import { Cone, Penalties, Period, ScoreReport, Scores } from './types'
 import capitalize from './capitalize'
 import LeftPanel from './LeftPanel'
 import RightPanel from './RightPanel'
@@ -28,6 +28,7 @@ function App() {
     minor: { againstBlue: 0, againstRed: 0 },
     major: { againstBlue: 0, againstRed: 0 }
   })
+  const [hoveredConeStack, setHoveredConeStack] = useState<Cone[]>([])
 
   const draw = (ctx: CanvasRenderingContext2D, frame: number) => {
     const canvas = document.getElementById('canvas') as HTMLCanvasElement | null
@@ -100,6 +101,7 @@ function App() {
           redPenaltyFor: 0
         })
         setPenalties({ minor: { againstBlue: 0, againstRed: 0 }, major: { againstBlue: 0, againstRed: 0 } })
+        setHoveredConeStack([])
         if (canvas) {
           field = new PowerPlayField(canvas)
           return 'autonomous'
@@ -116,6 +118,12 @@ function App() {
       setTimeout(copyScores, 0)
     }
   }, [penalties])
+
+  const handleMouseMove: MouseEventHandler = e => {
+    if (field) {
+      setHoveredConeStack(field.hoveredConeStack)
+    }
+  }
 
   const handlers = {
     CONTINUE: handleContinue // todo: this callback isn't getting the current value of period :(
@@ -149,7 +157,7 @@ function App() {
               <Heading fontFamily='mplus'>Sigma Scoring</Heading>
             </Flex>
             <Box w={{ base: '90vw', lg: '80vh' }} h={{ base: '90vw', lg: '80vh' }}>
-              {<Canvas onClick={handleClick} draw={draw} />}
+              {<Canvas draw={draw} onClick={handleClick} onMouseMove={handleMouseMove} />}
             </Box>
             <Flex justifyContent='center'>
               <Box>
@@ -171,6 +179,7 @@ function App() {
                 onMajorPenaltyChange={p =>
                   setPenalties(ps => ({ ...ps, major: { ...ps.major, againstRed: p >= 0 ? p : 0 } }))
                 }
+                hoveredConeStack={hoveredConeStack}
               />
             </Box>
           </Box>

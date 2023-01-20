@@ -65,7 +65,7 @@ const LeftPanel: FC<Props> = ({ scores, penalties, onMinorPenaltyChange, onMajor
       </Text>
       <Text>
         <b>Signal Park</b>: click on the signal, which will turn green. By default, each signal has a custom sleeve. To
-        remove this, alt-click the signal.
+        toggle this, alt-click the signal.
       </Text>
       <Text>
         <b>Terminal Park</b>: alt+click the terminal. This can be done up to two times on the same terminal to indicate
