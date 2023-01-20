@@ -1,4 +1,4 @@
-import React, { MouseEventHandler, useCallback, useEffect, useRef } from 'react'
+import React, { MouseEventHandler, useCallback, useEffect, useMemo, useRef } from 'react'
 import './App.css'
 import { Box, ChakraProvider, Flex, Heading, Text } from '@chakra-ui/react'
 import Canvas from './Canvas'
@@ -9,6 +9,7 @@ import { Cone, Penalties, Period, ScoreReport, Scores } from './types'
 import capitalize from './capitalize'
 import LeftPanel from './LeftPanel'
 import RightPanel from './RightPanel'
+import detectMobile from './detectMobile'
 
 let field: PowerPlayField | null = null
 
@@ -29,6 +30,7 @@ function App() {
     major: { againstBlue: 0, againstRed: 0 }
   })
   const [hoveredConeStack, setHoveredConeStack] = useState<Cone[]>([])
+  const isMobile = useMemo(() => detectMobile(), [])
 
   const draw = (ctx: CanvasRenderingContext2D, frame: number) => {
     const canvas = document.getElementById('canvas') as HTMLCanvasElement | null
@@ -137,26 +139,37 @@ function App() {
   return (
     <ChakraProvider>
       <GlobalHotKeys keyMap={keyMap} handlers={handlers}>
-        <Flex px='7vw' justifyContent='space-between' alignItems='center' h='100vh' fontFamily='mplus'>
-          <Box w='15vw' h={{ base: '90vw', lg: '80vh' }} border='8px solid #0a0ef2' outline='2px solid black'>
-            <Box w='100%' h='100%' outline='2px solid black'>
-              <LeftPanel
-                scores={scores}
-                penalties={penalties}
-                onMinorPenaltyChange={p =>
-                  setPenalties(ps => ({ ...ps, minor: { ...ps.minor, againstBlue: p >= 0 ? p : 0 } }))
-                }
-                onMajorPenaltyChange={p =>
-                  setPenalties(ps => ({ ...ps, major: { ...ps.major, againstBlue: p >= 0 ? p : 0 } }))
-                }
-              />
+        <Flex justifyContent='space-evenly' alignItems='center' h='100vh' fontFamily='mplus'>
+          {!isMobile && (
+            <Box w='17vw' minW='200px' h={{ base: '90vw', lg: '80vh' }} border='8px solid #0a0ef2' outline='2px solid black'>
+              <Box w='100%' h='100%' outline='2px solid black'>
+                <LeftPanel
+                  scores={scores}
+                  penalties={penalties}
+                  onMinorPenaltyChange={p =>
+                    setPenalties(ps => ({ ...ps, minor: { ...ps.minor, againstBlue: p >= 0 ? p : 0 } }))
+                  }
+                  onMajorPenaltyChange={p =>
+                    setPenalties(ps => ({ ...ps, major: { ...ps.major, againstBlue: p >= 0 ? p : 0 } }))
+                  }
+                />
+              </Box>
             </Box>
-          </Box>
+          )}
           <Box>
             <Flex justifyContent='center' mb='10px'>
               <Heading fontFamily='mplus'>Sigma Scoring</Heading>
             </Flex>
-            <Box w={{ base: '90vw', lg: '80vh' }} h={{ base: '90vw', lg: '80vh' }}>
+            <Box
+              // w={{ base: '40vw', md: '70vh', lg: '80vh' }}
+              // h={{ base: '40vw', md: '70vh', lg: '80vh' }}
+              // maxWidth={{ base: '100vw', md: '60vw', lg: '66vw' }}
+              // maxHeight={{ base: '100vh', md: '60vw', lg: '66vw' }}
+              w='50vw'
+              h='50vw'
+              maxH='80vh'
+              maxW='80vh'
+            >
               {<Canvas draw={draw} onClick={handleClick} onMouseMove={handleMouseMove} />}
             </Box>
             <Flex justifyContent='center'>
@@ -168,21 +181,23 @@ function App() {
               </Box>
             </Flex>
           </Box>
-          <Box w='15vw' h={{ base: '90vw', lg: '80vh' }} border='8px solid #fe0f0a' outline='2px solid black'>
-            <Box w='100%' h='100%' outline='2px solid black'>
-              <RightPanel
-                scores={scores}
-                penalties={penalties}
-                onMinorPenaltyChange={p =>
-                  setPenalties(ps => ({ ...ps, minor: { ...ps.minor, againstRed: p >= 0 ? p : 0 } }))
-                }
-                onMajorPenaltyChange={p =>
-                  setPenalties(ps => ({ ...ps, major: { ...ps.major, againstRed: p >= 0 ? p : 0 } }))
-                }
-                hoveredConeStack={hoveredConeStack}
-              />
+          {!isMobile && (
+            <Box w='17vw' minW='200px' h={{ base: '90vw', lg: '80vh' }} border='8px solid #fe0f0a' outline='2px solid black'>
+              <Box w='100%' h='100%' outline='2px solid black'>
+                <RightPanel
+                  scores={scores}
+                  penalties={penalties}
+                  onMinorPenaltyChange={p =>
+                    setPenalties(ps => ({ ...ps, minor: { ...ps.minor, againstRed: p >= 0 ? p : 0 } }))
+                  }
+                  onMajorPenaltyChange={p =>
+                    setPenalties(ps => ({ ...ps, major: { ...ps.major, againstRed: p >= 0 ? p : 0 } }))
+                  }
+                  hoveredConeStack={hoveredConeStack}
+                />
+              </Box>
             </Box>
-          </Box>
+          )}
         </Flex>
       </GlobalHotKeys>
     </ChakraProvider>
