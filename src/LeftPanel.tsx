@@ -12,7 +12,7 @@ interface Props {
 const LeftPanel: FC<Props> = ({ scores, penalties, onMinorPenaltyChange, onMajorPenaltyChange }) => {
   return (
     <Box p='10px'>
-      <Heading as='h6' fontSize={{ md: '16px', lg: '16px', xl: '26px' }}>
+      <Heading as='h6' fontSize={{ md: '16px', xl: '26px' }}>
         Blue Score: {scores.blue}
       </Heading>
       <Text fontSize={{ md: '12px', lg: '14px', xl: '16px' }}>Autonomous: {scores.blueAuton}</Text>
@@ -62,7 +62,7 @@ const LeftPanel: FC<Props> = ({ scores, penalties, onMinorPenaltyChange, onMajor
       <Heading mt={{ base: '10px', md: '15px', xl: '25px' }} as='h6' fontSize={{ md: '14px', lg: '18px', xl: '22px' }}>
         Usage
       </Heading>
-      <Box fontSize={{ lg: '9pt', xl: '11pt' }}>
+      <Box fontSize={{ base: '9pt', md: '10pt', lg: '10.5pt', xl: '9.5pt', '2xl': '11pt' }}>
         <Text>
           <b>Place a cone</b>: click on a junction or terminal. Left-click for blue and right-click for red.
         </Text>

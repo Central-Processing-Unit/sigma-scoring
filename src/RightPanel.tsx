@@ -1,4 +1,4 @@
-import { Box, Button, Fade, Flex, Heading, HStack, Input, Text } from '@chakra-ui/react'
+import { Box, Button, Flex, Heading, HStack, Input, Text } from '@chakra-ui/react'
 import React, { FC } from 'react'
 import { Cone, Penalties, ScoreReport } from './types'
 
@@ -13,57 +13,57 @@ interface Props {
 const RightPanel: FC<Props> = ({ scores, penalties, onMinorPenaltyChange, onMajorPenaltyChange, hoveredConeStack }) => {
   return (
     <Box p={{ md: '5px', lg: '10px' }}>
-      <Heading as='h6' fontSize={{ md: '18px', lg: '22px', xl: '28px' }}>
+      <Heading as='h6' fontSize={{ md: '16px', xl: '26px' }}>
         Red Score: {scores.red}
       </Heading>
-      <Text fontSize={{ md: '12px', lg: '14px', xl: '18px' }}>Autonomous: {scores.redAuton}</Text>
-      <Text fontSize={{ md: '12px', lg: '14px', xl: '18px' }}>Teleop: {scores.redTeleOp}</Text>
-      <Text fontSize={{ md: '12px', lg: '14px', xl: '18px' }}>Penalty: {scores.redPenaltyFor}</Text>
-      <Heading mt='25px' as='h6' fontSize={{ md: '18px', lg: '24px', xl: '28px' }}>
+      <Text fontSize={{ md: '12px', lg: '14px', xl: '16px' }}>Autonomous: {scores.redAuton}</Text>
+      <Text fontSize={{ md: '12px', lg: '14px', xl: '16px' }}>Teleop: {scores.redTeleOp}</Text>
+      <Text fontSize={{ md: '12px', lg: '14px', xl: '16px' }}>Penalty: {scores.redPenaltyFor}</Text>
+      <Heading mt='25px' as='h6' fontSize={{ md: '10px', lg: '15px', xl: '25px' }}>
         Penalize
       </Heading>
       <Flex alignItems='center' justifyContent='space-between'>
-        <Text mr='10px' fontSize={{ lg: '14px', xl: '18px' }}>
+        <Text mr='10px' fontSize={{ lg: '14px', xl: '16px' }}>
           Minor:{' '}
         </Text>
         <HStack>
-          <Button size={{ base: 'xs', xl: 'sm' }} onClick={() => onMinorPenaltyChange(penalties.minor.againstRed + 1)}>
+          <Button size='xs' onClick={() => onMinorPenaltyChange(penalties.minor.againstRed + 1)}>
             +
           </Button>
           <Input
-            size={{ base: 'xs', xl: 'sm' }}
+            size='xs'
             type='number'
-            w={{ sm: '20px', md: '35px', lg: '50px' }}
+            w={{ sm: '20px', md: '35px' }}
             value={penalties.minor.againstRed}
             onChange={e => onMinorPenaltyChange(Number(e.target.value))}
           />
-          <Button size={{ base: 'xs', xl: 'sm' }} onClick={() => onMinorPenaltyChange(penalties.minor.againstRed - 1)}>
+          <Button size='xs' onClick={() => onMinorPenaltyChange(penalties.minor.againstRed - 1)}>
             -
           </Button>
         </HStack>
       </Flex>
       <Flex mt='10px' alignItems='center' justifyContent='space-between'>
-        <Text fontSize={{ lg: '14px', xl: '18px' }}>Major: </Text>
+        <Text fontSize={{ lg: '14px', xl: '16px' }}>Major: </Text>
         <HStack>
-          <Button size={{ base: 'xs', xl: 'sm' }} onClick={() => onMajorPenaltyChange(penalties.major.againstRed + 1)}>
+          <Button size='xs' onClick={() => onMajorPenaltyChange(penalties.major.againstRed + 1)}>
             +
           </Button>
           <Input
-            size={{ base: 'xs', xl: 'sm' }}
+            size='xs'
             type='number'
             w={{ sm: '20px', md: '35px' }}
             value={penalties.major.againstRed}
             onChange={e => onMajorPenaltyChange(Number(e.target.value))}
           />
-          <Button size={{ base: 'xs', xl: 'sm' }} onClick={() => onMajorPenaltyChange(penalties.major.againstRed - 1)}>
+          <Button size='xs' onClick={() => onMajorPenaltyChange(penalties.major.againstRed - 1)}>
             -
           </Button>
         </HStack>
       </Flex>
-      <Heading mt='25px' as='h6' fontSize={{ md: '18px', lg: '24px', xl: '28px' }}>
+      <Heading mt={{ base: '10px', md: '15px', xl: '25px' }} as='h6' fontSize={{ md: '14px', lg: '18px', xl: '22px' }}>
         Cone Stack
       </Heading>
-      <Text mt='10px' fontSize={{ md: '12px', lg: '14px', xl: '18px' }}>
+      <Text mt='10px' fontSize={{ md: '12px', lg: '14px', xl: '16px' }}>
         Hover a junction or terminal with cones to see the stack below.
       </Text>
       <Flex flexDir='column-reverse' alignItems='center' mt='10px'>

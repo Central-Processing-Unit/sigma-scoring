@@ -1,6 +1,6 @@
 import React, { MouseEventHandler, useCallback, useEffect, useMemo, useRef } from 'react'
 import './App.css'
-import { Box, ChakraProvider, Flex, Heading, Text } from '@chakra-ui/react'
+import { Box, Flex, Heading, Text, ThemeOverride, useBreakpoint, useBreakpointValue, useDimensions } from '@chakra-ui/react'
 import Canvas from './Canvas'
 import { useState } from 'react'
 import { GlobalHotKeys } from 'react-hotkeys'
@@ -30,7 +30,7 @@ function App() {
     major: { againstBlue: 0, againstRed: 0 }
   })
   const [hoveredConeStack, setHoveredConeStack] = useState<Cone[]>([])
-  const isMobile = useMemo(() => detectMobile(), [])
+  const isMobile = detectMobile()
 
   const draw = (ctx: CanvasRenderingContext2D, frame: number) => {
     const canvas = document.getElementById('canvas') as HTMLCanvasElement | null
@@ -128,20 +128,29 @@ function App() {
   }
 
   const handlers = {
-    CONTINUE: handleContinue // todo: this callback isn't getting the current value of period :(
+    CONTINUE: handleContinue
   }
 
   const keyMap = {
     CONTINUE: ['space']
   }
 
-  // todo: show cones visually on hover on a side panel
   return (
-    <ChakraProvider>
+    <Box>
       <GlobalHotKeys keyMap={keyMap} handlers={handlers}>
-        <Flex justifyContent='space-evenly' alignItems='center' h='100vh' fontFamily='mplus'>
+        <Heading display={isMobile ? 'inline-flex' : { base: 'inline-flex', md: 'none' }}>
+          This site does not support phones or other devices with small screens.
+        </Heading>
+        <Flex justifyContent='space-evenly' alignItems='center' h={{ base: '80vh', md: '100vh' }} fontFamily='mplus'>
           {!isMobile && (
-            <Box w='17vw' minW='200px' h={{ base: '90vw', lg: '80vh' }} border='8px solid #0a0ef2' outline='2px solid black'>
+            <Box
+              display={{ base: 'none', md: 'inline-block' }}
+              w='17vw'
+              minW='200px'
+              h={{ base: '90vw', md: '80vh' }}
+              border='8px solid #0a0ef2'
+              outline='2px solid black'
+            >
               <Box w='100%' h='100%' outline='2px solid black'>
                 <LeftPanel
                   scores={scores}
@@ -158,15 +167,17 @@ function App() {
           )}
           <Box>
             <Flex justifyContent='center' mb='10px'>
-              <Heading fontFamily='mplus'>Sigma Scoring</Heading>
+              <Box>
+                <Heading fontFamily='mplus'>Sigma Scoring</Heading>
+              </Box>
             </Flex>
             <Box
               // w={{ base: '40vw', md: '70vh', lg: '80vh' }}
               // h={{ base: '40vw', md: '70vh', lg: '80vh' }}
               // maxWidth={{ base: '100vw', md: '60vw', lg: '66vw' }}
               // maxHeight={{ base: '100vh', md: '60vw', lg: '66vw' }}
-              w='50vw'
-              h='50vw'
+              w={{ base: '80vw', md: '50vw' }}
+              h={{ base: '80vw', md: '50vw' }}
               maxH='80vh'
               maxW='80vh'
             >
@@ -182,7 +193,14 @@ function App() {
             </Flex>
           </Box>
           {!isMobile && (
-            <Box w='17vw' minW='200px' h={{ base: '90vw', lg: '80vh' }} border='8px solid #fe0f0a' outline='2px solid black'>
+            <Box
+              display={{ base: 'none', md: 'inline-block' }}
+              w='17vw'
+              minW='200px'
+              h={{ base: '90vw', md: '80vh' }}
+              border='8px solid #fe0f0a'
+              outline='2px solid black'
+            >
               <Box w='100%' h='100%' outline='2px solid black'>
                 <RightPanel
                   scores={scores}
@@ -200,7 +218,7 @@ function App() {
           )}
         </Flex>
       </GlobalHotKeys>
-    </ChakraProvider>
+    </Box>
   )
 }
 
